@@ -1,22 +1,31 @@
 {
     "compilerOptions": {
-        "moduleResolution": "Node",
         "target": "ES2015",
+        "useDefineForClassFields": true,
+        "lib": [
+            "ES2015",
+            "DOM",
+            "DOM.Iterable"
+        ],
         "module": "ES2015",
-        "importsNotUsedAsValues": "error",
-        "isolatedModules": true,
-        "resolveJsonModule": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "baseUrl": ".",
-        "allowJs": true,
-        "checkJs": true
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
     },
     "include": [
-        "src/**/*.d.ts",
-        "src/**/*.js",
-        "src/**/*.svelte"
+        "src"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
     ]
 }

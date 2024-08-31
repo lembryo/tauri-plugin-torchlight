@@ -1,16 +1,13 @@
 import { defineConfig } from "vite"
-import { svelte } from "@sveltejs/vite-plugin-svelte"
+import react from "@vitejs/plugin-react"
 
 const host = process.env.TAURI_DEV_HOST
 
-// https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [svelte()],
-
-    // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-    // prevent vite from obscuring rust errors
+    plugins: [
+        react(),
+    ],
     clearScreen: false,
-    // tauri expects a fixed port, fail if that port is not available
     server: {
         host: host || false,
         port: 1420,
@@ -19,6 +16,9 @@ export default defineConfig({
             protocol: "ws",
             host,
             port: 1421
-        } : undefined
+        } : undefined,
+        watch: {
+            ignored: ["**/src-tauri/**"]
+        }
     }
 })
