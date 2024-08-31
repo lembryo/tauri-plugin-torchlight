@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "Node",
+        "target": "ES2015",
+        "module": "ES2015",
+        "importsNotUsedAsValues": "error",
+        "isolatedModules": true,
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "allowJs": true,
+        "checkJs": true
+    },
+    "include": [
+        "src/**/*.d.ts",
+        "src/**/*.js",
+        "src/**/*.svelte"
+    ]
+}

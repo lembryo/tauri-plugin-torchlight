@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Tauri Plugin Torchlight Example</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-size: 1.5em;
+            color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .button:hover {
+            transform: scale(1.1);
+        }
+
+        .button:active {
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="title">TorchLight</div>
+    <button class="button" id="torchButton">
+        Turn On
+    </button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const torchButton = document.getElementById("torchButton")
+        let torchOn = false
+        torchButton.addEventListener("click", () => {
+            torchOn = !torchOn
+            torchButton.textContent = torchOn ? "Turn Off" : "Turn On"
+        })
+    })
+</script>
+</body>
+
+</html>

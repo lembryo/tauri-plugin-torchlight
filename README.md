@@ -1,1 +1,1 @@
-# tauri-plugin-torchlight
+# Tauri Plugin torchlight
