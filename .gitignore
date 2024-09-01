@@ -15,3 +15,5 @@ node_modules/
 
 dist-js
 dist
+/android/gradlew.bat
+/android/gradlew

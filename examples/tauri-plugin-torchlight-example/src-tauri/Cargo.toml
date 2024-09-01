@@ -1,10 +1,9 @@
 [package]
 name = "tauri-plugin-torchlight-example"
-version = "0.1.0"
+version = "1.0.0"
 description = "An example of using tauri-plugin-torchlight"
 authors = ["mao lembryo@gmail.com"]
 license = "MIT"
-repository = ""
 edition = "2021"
 rust-version = "1.80.0"
 

@@ -18,17 +18,18 @@ pub fn init<R: Runtime, C: DeserializeOwned>(_app: &AppHandle<R>, api: PluginApi
 pub struct Torchlight<R: Runtime>(PluginHandle<R>);
 
 impl<R: Runtime> Torchlight<R> {
+
     pub fn torch_on(&self) -> crate::Result<()> {
         self
             .0
-            .run_mobile_plugin("torch_on")
+            .run_mobile_plugin("torchOn", ())
             .map_err(Into::into)
     }
 
     pub fn torch_off(&self) -> crate::Result<()> {
         self
             .0
-            .run_mobile_plugin("torch_off")
+            .run_mobile_plugin("torchOff", ())
             .map_err(Into::into)
     }
 }
