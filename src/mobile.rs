@@ -9,9 +9,9 @@ tauri::ios_plugin_binding!(init_plugin_torchlight);
 
 pub fn init<R: Runtime, C: DeserializeOwned>(_app: &AppHandle<R>, api: PluginApi<R, C>) -> crate::Result<Torchlight<R>> {
     #[cfg(target_os = "android")]
-    let handle = api.register_android_plugin("", "TorchlightPlugin")?;
+    let handle = api.register_android_plugin("com.lembryo.tauri.plugin.torchlight", "TorchlightPlugin").unwrap();
     #[cfg(target_os = "ios")]
-    let handle = api.register_ios_plugin(init_plugin_torchlight)?;
+    let handle = api.register_ios_plugin(init_plugin_torchlight).unwrap();
     Ok(Torchlight(handle))
 }
 

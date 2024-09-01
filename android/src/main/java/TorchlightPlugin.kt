@@ -9,18 +9,20 @@ import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
 import app.tauri.plugin.Invoke
 
-@TauriPlugin
+@TauriPlugin(permissions = [
+    Permission(strings = [Manifest.permission.CAMERA], alias = "camera")
+])
 class TorchlightPlugin(private val activity: Activity) : Plugin(activity) {
 
     @Command
-    fun torch_on(invoke: Invoke) {
+    fun torchOn(invoke: Invoke) {
         // TODO: Implement your plugin's logic here
-        Log.d("TorchlightPlugin", "torch_on")
+        Log.d("TorchlightPlugin", "torch-on")
     }
 
     @Command
-    fun torch_off(invoke: Invoke) {
+    fun torchOff(invoke: Invoke) {
         // TODO: Implement your plugin's logic here
-        Log.d("TorchlightPlugin", "torch_on")
+        Log.d("TorchlightPlugin", "torch-off")
     }
 }

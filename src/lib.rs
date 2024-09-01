@@ -38,7 +38,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         ])
         .setup(|app, api| {
             #[cfg(mobile)]
-            let torchlight = mobile::init(app, api).unwrap();
+            let torchlight = mobile::init(app, api);
             #[cfg(desktop)]
             let torchlight = desktop::init(app, api).unwrap();
             app.manage(torchlight);
