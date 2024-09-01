@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.lembryo.tauri.plugin.torchlight"
+    namespace = "com.lembryo.tauri.plugin.torchlight.example"
     compileSdk = 34
 
     defaultConfig {
@@ -33,5 +33,6 @@ android {
 
 dependencies {
     implementation(project(":tauri-android"))
+    implementation("androidx.test.ext:junit-ktx:1.2.1")
     testImplementation("junit:junit:4.13.2")
 }

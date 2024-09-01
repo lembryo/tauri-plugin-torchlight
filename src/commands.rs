@@ -4,11 +4,6 @@ use crate::Result;
 use crate::TorchlightExt;
 
 #[command]
-pub(crate) async fn torch_on<R: Runtime>(app: AppHandle<R>) -> Result<()> {
-    app.torchlight().torch_on()
-}
-
-#[command]
-pub(crate) async fn torch_off<R: Runtime>(app: AppHandle<R>) -> Result<()> {
-    app.torchlight().torch_off()
+pub(crate) async fn torch<R: Runtime>(app: AppHandle<R>, enabled: bool) -> Result<()> {
+    app.torchlight().torch(enabled)
 }

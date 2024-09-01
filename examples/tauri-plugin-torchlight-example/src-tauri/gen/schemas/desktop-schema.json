@@ -2146,6 +2146,13 @@
           ]
         },
         {
+          "description": "torchlight:allow-torch -> Enables the torch command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "torchlight:allow-torch"
+          ]
+        },
+        {
           "description": "torchlight:allow-torch-off -> Enables the torch_off command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -2157,6 +2164,13 @@
           "type": "string",
           "enum": [
             "torchlight:allow-torch-on"
+          ]
+        },
+        {
+          "description": "torchlight:deny-torch -> Denies the torch command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "torchlight:deny-torch"
           ]
         },
         {

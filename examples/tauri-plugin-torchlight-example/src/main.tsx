@@ -9,18 +9,22 @@ if (root) {
         const button = document.getElementById("torchButton") as HTMLButtonElement
         if (button.innerText === "Turn On") {
             button.innerText = "Turn Off"
-            invoke("plugin:torchlight|torch_off")
-                .then((response) => {
-                    console.log(response)
+            invoke("plugin:torchlight|torch", {
+                enabled: true
+            })
+                .then(() => {
+                    console.log("success torch on")
                 })
                 .catch((error) => {
                     console.error(error)
                 })
         } else {
             button.innerText = "Turn On"
-            invoke("plugin:torchlight|torch_on")
-                .then((response) => {
-                    console.log(response)
+            invoke("plugin:torchlight|torch", {
+                enabled: false
+            })
+                .then(() => {
+                    console.log("success torch off")
                 })
                 .catch((error) => {
                     console.error(error)

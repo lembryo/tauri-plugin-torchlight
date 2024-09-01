@@ -1,4 +1,5 @@
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tauri::{
     plugin::{PluginApi, PluginHandle},
     AppHandle, Runtime,
@@ -17,19 +18,19 @@ pub fn init<R: Runtime, C: DeserializeOwned>(_app: &AppHandle<R>, api: PluginApi
 
 pub struct Torchlight<R: Runtime>(PluginHandle<R>);
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TorchRequest {
+    enabled: bool,
+}
+
 impl<R: Runtime> Torchlight<R> {
-
-    pub fn torch_on(&self) -> crate::Result<()> {
+    pub fn torch(&self, enabled: bool) -> crate::Result<()> {
         self
             .0
-            .run_mobile_plugin("torchOn", ())
-            .map_err(Into::into)
-    }
-
-    pub fn torch_off(&self) -> crate::Result<()> {
-        self
-            .0
-            .run_mobile_plugin("torchOff", ())
+            .run_mobile_plugin("torch", TorchRequest {
+                enabled: true,
+            })
             .map_err(Into::into)
     }
 }

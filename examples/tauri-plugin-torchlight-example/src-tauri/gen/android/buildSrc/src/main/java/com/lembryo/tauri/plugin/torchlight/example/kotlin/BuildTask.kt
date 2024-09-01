@@ -29,24 +29,24 @@ open class BuildTask : DefaultTask() {
     }
 
     fun runTauriCli(executable: String) {
-        val rootDirRel = rootDirRel ?: throw GradleException("rootDirRel cannot be null")
-        val target = target ?: throw GradleException("target cannot be null")
-        val release = release ?: throw GradleException("release cannot be null")
-        val args = listOf("run", "--", "tauri", "android", "android-studio-script");
-
-        project.exec {
-            workingDir(File(project.projectDir, rootDirRel))
-            executable(executable)
-            args(args)
-            if (project.logger.isEnabled(LogLevel.DEBUG)) {
-                args("-vv")
-            } else if (project.logger.isEnabled(LogLevel.INFO)) {
-                args("-v")
-            }
-            if (release) {
-                args("--release")
-            }
-            args(listOf("--target", target))
-        }.assertNormalExitValue()
+//        val rootDirRel = rootDirRel ?: throw GradleException("rootDirRel cannot be null")
+//        val target = target ?: throw GradleException("target cannot be null")
+//        val release = release ?: throw GradleException("release cannot be null")
+//        val args = listOf("run", "--", "tauri", "android", "android-studio-script");
+//
+//        project.exec {
+//            workingDir(File(project.projectDir, rootDirRel))
+//            executable(executable)
+//            args(args)
+//            if (project.logger.isEnabled(LogLevel.DEBUG)) {
+//                args("-vv")
+//            } else if (project.logger.isEnabled(LogLevel.INFO)) {
+//                args("-v")
+//            }
+//            if (release) {
+//                args("--release")
+//            }
+//            args(listOf("--target", target))
+//        }.assertNormalExitValue()
     }
 }

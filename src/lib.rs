@@ -1,7 +1,4 @@
-use tauri::{
-    plugin::{Builder, TauriPlugin},
-    Manager, Runtime,
-};
+use tauri::{plugin::{Builder, TauriPlugin}, Manager, Runtime};
 
 #[cfg(desktop)]
 mod desktop;
@@ -14,7 +11,8 @@ mod models;
 
 pub use error::{Error, Result};
 
-use crate::commands::{torch_off, torch_on};
+use crate::commands::torch;
+
 #[cfg(desktop)]
 use desktop::Torchlight;
 #[cfg(mobile)]
@@ -33,12 +31,11 @@ impl<R: Runtime, T: Manager<R>> TorchlightExt<R> for T {
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("torchlight")
         .invoke_handler(tauri::generate_handler![
-            torch_on,
-            torch_off,
+            torch,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]
-            let torchlight = mobile::init(app, api);
+            let torchlight = mobile::init(app, api).unwrap();
             #[cfg(desktop)]
             let torchlight = desktop::init(app, api).unwrap();
             app.manage(torchlight);

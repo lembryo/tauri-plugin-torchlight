@@ -11,16 +11,8 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
 pub struct Torchlight<R: Runtime>(AppHandle<R>);
 
 impl<R: Runtime> Torchlight<R> {
-
-    pub fn torch_on(&self) -> crate::Result<()> {
-        // TODO: implement the torch_on API
-        println!("torch_on");
-        Ok(())
-    }
-
-    pub fn torch_off(&self) -> crate::Result<()> {
-        // TODO: implement the torch_off API
-        println!("torch_off");
+    pub fn torch(&self, enabled: bool) -> crate::Result<()> {
+        println!("torch {}", enabled);
         Ok(())
     }
 }

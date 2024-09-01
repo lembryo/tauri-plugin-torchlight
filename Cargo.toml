@@ -4,6 +4,7 @@ version = "1.0.0"
 authors = ["mao <mao.lembryo@gmail.com>"]
 description = "Tauri plugin for smartphone torchlight"
 edition = "2021"
+repository = "https://github.com/lembryo/tauri-plugin-torchlight.git"
 rust-version = "1.80.0"
 exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
 links = "tauri-plugin-torchlight"
