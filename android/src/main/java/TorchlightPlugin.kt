@@ -17,11 +17,7 @@ class Option {
     var enabled: Boolean = false
 }
 
-@TauriPlugin(
-//permissions = [
-//    Permission(strings = [Manifest.permission.CAMERA], alias = "camera")
-//]
-)
+@TauriPlugin()
 class TorchlightPlugin(private val activity: Activity) : Plugin(activity) {
 
     @Command
