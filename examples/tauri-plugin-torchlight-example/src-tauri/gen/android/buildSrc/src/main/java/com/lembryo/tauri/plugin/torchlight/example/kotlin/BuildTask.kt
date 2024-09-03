@@ -28,7 +28,7 @@ open class BuildTask : DefaultTask() {
         }
     }
 
-    fun runTauriCli(executable: String) {
+    private fun runTauriCli(executable: String) {
 //        val rootDirRel = rootDirRel ?: throw GradleException("rootDirRel cannot be null")
 //        val target = target ?: throw GradleException("target cannot be null")
 //        val release = release ?: throw GradleException("release cannot be null")

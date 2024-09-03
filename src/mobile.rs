@@ -29,7 +29,7 @@ impl<R: Runtime> Torchlight<R> {
         self
             .0
             .run_mobile_plugin("torch", TorchRequest {
-                enabled: true,
+                enabled,
             })
             .map_err(Into::into)
     }

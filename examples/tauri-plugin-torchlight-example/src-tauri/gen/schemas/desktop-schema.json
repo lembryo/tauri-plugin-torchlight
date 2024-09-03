@@ -2153,38 +2153,10 @@
           ]
         },
         {
-          "description": "torchlight:allow-torch-off -> Enables the torch_off command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "torchlight:allow-torch-off"
-          ]
-        },
-        {
-          "description": "torchlight:allow-torch-on -> Enables the torch_on command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "torchlight:allow-torch-on"
-          ]
-        },
-        {
           "description": "torchlight:deny-torch -> Denies the torch command without any pre-configured scope.",
           "type": "string",
           "enum": [
             "torchlight:deny-torch"
-          ]
-        },
-        {
-          "description": "torchlight:deny-torch-off -> Denies the torch_off command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "torchlight:deny-torch-off"
-          ]
-        },
-        {
-          "description": "torchlight:deny-torch-on -> Denies the torch_on command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "torchlight:deny-torch-on"
           ]
         }
       ]

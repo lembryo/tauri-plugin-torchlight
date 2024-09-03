@@ -6,10 +6,16 @@ import android.content.Context
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
 import app.tauri.annotation.Command
+import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.Permission
 import app.tauri.annotation.TauriPlugin
 import app.tauri.plugin.Invoke
 import app.tauri.plugin.Plugin
+
+@InvokeArg
+class Option {
+    var enabled: Boolean = false
+}
 
 @TauriPlugin(
 //permissions = [
@@ -19,7 +25,9 @@ import app.tauri.plugin.Plugin
 class TorchlightPlugin(private val activity: Activity) : Plugin(activity) {
 
     @Command
-    fun torch(enabled: Boolean) {
+    fun torch(invoke: Invoke) {
+        val args = invoke.parseArgs(Option::class.java)
+        val enabled = args.enabled
         val cameraId: String
         val cm = activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
