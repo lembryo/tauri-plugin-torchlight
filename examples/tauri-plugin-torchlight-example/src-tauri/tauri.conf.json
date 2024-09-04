@@ -1,0 +1,35 @@
+{
+    "productName": "tauri-plugin-torchlight-example",
+    "version": "1.0.0",
+    "identifier": "com.lembryo.tauri.plugin.torchlight.example",
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "devUrl": "http://localhost:1420",
+        "beforeBuildCommand": "npm run build",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "withGlobalTauri": false,
+        "security": {
+            "csp": null
+        },
+        "windows": [
+            {
+                "fullscreen": false,
+                "height": 600,
+                "resizable": true,
+                "title": "tauri-app",
+                "width": 800
+            }
+        ]
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": [
+            "icons/icon.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ]
+    }
+}

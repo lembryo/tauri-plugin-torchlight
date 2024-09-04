@@ -1,0 +1,17 @@
+/.vs
+.DS_Store
+.Thumbs.db
+*.sublime*
+.idea/
+debug.log
+.vscode/settings.json
+yarn.lock
+
+/.tauri
+/target
+node_modules/
+
+dist-js
+dist
+/android/gradlew.bat
+/android/gradlew
