@@ -8,7 +8,6 @@ This plugin is designed for mobile applications using Tauri v2.
 - Turn the smartphone's flashlight on or off.
 - Cross-platform support for Android and iOS.
 - Simple API for integration with your Tauri-based applications.
-- **Currently only available for Android (iOS will be released at a later date)**
 
 ## Installation
 
@@ -61,9 +60,9 @@ invoke("plugin:torchlight|torch", {
     .then(() => {
         // If successful, the then function is called.
     })
-    .catch((error) => {
+    .catch((e) => {
         // Handle the error
-        console.error(error)
+        console.error(e)
     })
 ```
 
