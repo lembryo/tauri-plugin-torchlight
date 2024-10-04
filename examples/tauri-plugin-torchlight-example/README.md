@@ -17,3 +17,7 @@ $ npm install
 ```bash
 $ npm run tauri android dev
 ```
+
+## License
+
+This plugin is licensed under the MIT or Apache 2.0 license, at your option.

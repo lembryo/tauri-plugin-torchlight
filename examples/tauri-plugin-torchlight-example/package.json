@@ -10,19 +10,19 @@
         "tauri": "tauri"
     },
     "dependencies": {
-        "@tauri-apps/api": "2.0.0-rc.4",
-        "@vitejs/plugin-react": "4.3.1",
+        "@tauri-apps/api": "2.0.1",
+        "@vitejs/plugin-react": "4.3.2",
         "react": "18.3.1",
         "react-dom": "18.3.1",
         "tauri-plugin-torchlight-api": "file:../../"
     },
     "devDependencies": {
-        "@tauri-apps/cli": "2.0.0-rc.13",
-        "@types/react": "18.3.5",
+        "@tauri-apps/cli": "2.0.1",
+        "@types/react": "18.3.11",
         "@types/react-dom": "18.3.0",
         "license-checker": "25.0.1",
         "prettier": "3.3.3",
         "prettier-plugin-rust": "0.1.9",
-        "vite": "4.5.3"
+        "vite": "4.5.5"
     }
 }
