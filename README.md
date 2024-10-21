@@ -19,7 +19,7 @@ Add the following line to your `src-tauri/Cargo.toml` file to include the plugin
 
 ```toml
 [dependencies]
-tauri-plugin-torchlight = { version = "1.0.0", git = "https://github.com/lembryo/tauri-plugin-torchlight.git" }
+tauri-plugin-torchlight = { version = "1.0.2", git = "https://github.com/lembryo/tauri-plugin-torchlight.git" }
 ```
 
 ### JavaScript/TypeScript Setup
