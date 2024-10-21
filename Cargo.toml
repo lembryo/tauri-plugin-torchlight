@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-torchlight"
-version = "1.0.0"
+version = "1.0.2"
 authors = ["mao <mao.lembryo@gmail.com>"]
 description = "Tauri plugin for smartphone torchlight"
 edition = "2021"
@@ -10,7 +10,7 @@ exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
 links = "tauri-plugin-torchlight"
 
 [dependencies]
-tauri = { version = "2.0.1" }
+tauri = { version = "2.0.4" }
 serde = "1.0.210"
 thiserror = "1.0.64"
 
