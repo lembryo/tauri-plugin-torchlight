@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-torchlight-example"
-version = "1.0.2"
+version = "1.0.3"
 description = "An example of using tauri-plugin-torchlight"
 authors = ["mao <mao.lembryo@gmail.com>"]
 license = "MIT"
