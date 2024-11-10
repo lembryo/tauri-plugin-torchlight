@@ -2,8 +2,8 @@
 <paths>
     <external-path
         name="my_images"
-        path="." />
+        path="."/>
     <cache-path
         name="my_cache_images"
-        path="." />
+        path="."/>
 </paths>

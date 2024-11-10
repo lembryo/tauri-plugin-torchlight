@@ -1,6 +1,6 @@
 {
     "productName": "tauri-plugin-torchlight-example",
-    "version": "1.0.0",
+    "version": "1.0.4",
     "identifier": "com.lembryo.tauri.plugin.torchlight.example",
     "build": {
         "beforeDevCommand": "npm run dev",
@@ -18,7 +18,7 @@
                 "fullscreen": false,
                 "height": 600,
                 "resizable": true,
-                "title": "tauri-app",
+                "title": "Tauri Plug-in Torchlight Example",
                 "width": 800
             }
         ]

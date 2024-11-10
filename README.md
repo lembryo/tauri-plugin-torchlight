@@ -19,7 +19,7 @@ Add the following line to your `src-tauri/Cargo.toml` file to include the plugin
 
 ```toml
 [dependencies]
-tauri-plugin-torchlight = { version = "1.0.2", git = "https://github.com/lembryo/tauri-plugin-torchlight.git" }
+tauri-plugin-torchlight = { git = "https://github.com/lembryo/tauri-plugin-torchlight.git" }
 ```
 
 ### JavaScript/TypeScript Setup
@@ -40,7 +40,8 @@ First, register the plugin in your Tauri application. Add the following in your 
     }
     ```
 
-Next, add the required permissions to your Tauri application. Add the following in your `src-tauri/capabilities/default.json` file:
+Next, add the required permissions to your Tauri application. Add the following in your
+`src-tauri/capabilities/default.json` file:
 
 - src-tauri/capabilities/default.json
     ```json
