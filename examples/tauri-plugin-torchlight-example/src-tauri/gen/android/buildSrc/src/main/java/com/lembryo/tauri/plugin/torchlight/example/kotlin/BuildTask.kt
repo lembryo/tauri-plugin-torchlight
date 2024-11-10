@@ -18,16 +18,16 @@ open class BuildTask : DefaultTask() {
 
     @TaskAction
     fun assemble() {
-        val executable = """npm"""
-        try {
-            runTauriCli(executable)
-        } catch (e: Exception) {
-            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                runTauriCli("$executable.cmd")
-            } else {
-                throw e
-            }
-        }
+//        val executable = """npm"""
+//        try {
+//            runTauriCli(executable)
+//        } catch (e: Exception) {
+//            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+//                runTauriCli("$executable.cmd")
+//            } else {
+//                throw e
+//            }
+//        }
     }
 
     private fun runTauriCli(executable: String) {
