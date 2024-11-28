@@ -1,6 +1,6 @@
 {
     "productName": "tauri-plugin-torchlight-example",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "identifier": "com.lembryo.tauri.plugin.torchlight.example",
     "build": {
         "beforeDevCommand": "npm run dev",
