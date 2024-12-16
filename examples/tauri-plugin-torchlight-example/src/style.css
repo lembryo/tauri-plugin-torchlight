@@ -36,3 +36,9 @@ body {
 .button:active {
     transform: scale(1);
 }
+
+.error {
+    color: #ff0000;
+    font-size: 1.5em;
+    margin-top: 20px;
+}

@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-torchlight"
-version = "1.0.6"
+version = "1.0.7"
 authors = ["mao <mao.lembryo@gmail.com>"]
 description = "Tauri plugin for smartphone torchlight"
 edition = "2021"
