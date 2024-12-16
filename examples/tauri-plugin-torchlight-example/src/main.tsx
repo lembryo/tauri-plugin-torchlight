@@ -1,11 +1,13 @@
 import "./style.css"
-import { createRoot } from "react-dom/client"
+
 import { invoke } from "@tauri-apps/api/core"
+import { createRoot } from "react-dom/client"
 
 const root: HTMLElement | null = document.getElementById("root")
 if (root) {
 
     const click = () => {
+        const error = document.getElementById("error") as HTMLDivElement
         const button = document.getElementById("torchButton") as HTMLButtonElement
         if (button.innerText === "Turn On") {
             button.innerText = "Turn Off"
@@ -13,10 +15,10 @@ if (root) {
                 enabled: true
             })
                 .then(() => {
-                    console.log("success torch on")
+                    error.innerText = ""
                 })
                 .catch((error) => {
-                    console.error(error)
+                    error.innerText = error.message
                 })
         } else {
             button.innerText = "Turn On"
@@ -24,10 +26,10 @@ if (root) {
                 enabled: false
             })
                 .then(() => {
-                    console.log("success torch off")
+                    error.innerText = ""
                 })
                 .catch((error) => {
-                    console.error(error)
+                    error.innerText = error.message
                 })
         }
     }
@@ -40,6 +42,8 @@ if (root) {
             }}>
                 Turn On
             </button>
+            <div className="error" id="error">
+            </div>
         </div>
     </>)
 }
