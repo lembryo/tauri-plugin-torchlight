@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Tauri Plugin Torchlight Example</string>
+    <string name="main_activity_title">Tauri Plugin Torchlight Example</string>
+</resources>
