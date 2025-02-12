@@ -1,0 +1,19 @@
+[package]
+name = "tauri-plugin-torchlight-example"
+version = "1.0.7"
+description = "An example of using tauri-plugin-torchlight"
+authors = ["mao <mao.lembryo@gmail.com>"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.62.0"
+
+[lib]
+name = "tauri_plugin_torchlight_example"
+crate-type = ["staticlib", "cdylib", "lib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.3", default-features = false, features = [] }
+
+[dependencies]
+tauri = { version = "2.1.1", features = [] }
+tauri-plugin-torchlight = { git = "https://github.com/lembryo/tauri-plugin-torchlight.git" }
