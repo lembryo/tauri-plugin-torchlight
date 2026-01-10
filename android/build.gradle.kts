@@ -33,6 +33,6 @@ android {
 
 dependencies {
     implementation(project(":tauri-android"))
-    implementation("androidx.test.ext:junit-ktx:1.2.1")
+    implementation("androidx.test.ext:junit-ktx:1.3.0")
     testImplementation("junit:junit:4.13.2")
 }
