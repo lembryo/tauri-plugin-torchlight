@@ -1,6 +1,6 @@
 {
     "productName": "tauri-plugin-torchlight-example",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "identifier": "com.lembryo.tauri.plugin.torchlight.example",
     "build": {
         "beforeDevCommand": "npm run dev",
@@ -26,10 +26,6 @@
     "bundle": {
         "active": true,
         "targets": "all",
-        "icon": [
-            "icons/icon.png",
-            "icons/icon.icns",
-            "icons/icon.ico"
-        ]
+        "icon": ["icons/icon.png", "icons/icon.icns", "icons/icon.ico"]
     }
 }

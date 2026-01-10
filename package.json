@@ -1,6 +1,6 @@
 {
     "name": "tauri-plugin-torchlight-api",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "author": "mao <mao.lembryo@gmail.com>",
     "description": "",
     "type": "module",
@@ -22,12 +22,12 @@
         "pretest": "pnpm build"
     },
     "dependencies": {
-        "@tauri-apps/api": "2.1.1"
+        "@tauri-apps/api": "2.9.1"
     },
     "devDependencies": {
         "license-checker": "25.0.1",
-        "prettier": "3.4.2",
+        "prettier": "3.7.4",
         "prettier-plugin-rust": "0.1.9",
-        "typescript": "5.7.2"
+        "typescript": "5.9.3"
     }
 }
