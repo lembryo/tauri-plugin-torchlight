@@ -5,6 +5,6 @@
     "useTabs": false,
     "lineWidth": 120,
     "plugins": [
-        "./node_modules/prettier-plugin-rust"
+        "prettier-plugin-rust"
     ]
 }

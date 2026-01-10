@@ -14,7 +14,7 @@ class TorchlightPlugin: Plugin {
         let args = try invoke.parseArgs(OptionArgs.self)
 
         guard let device = AVCaptureDevice.default(for: .video), device.hasTorch else {
-            print("Torch not available")
+            invoke.reject("Torch not available")
             return
         }
 
@@ -23,14 +23,14 @@ class TorchlightPlugin: Plugin {
 
             if args.enabled {
                 try device.setTorchModeOn(level: 1.0)
-                device.torchMode = AVCaptureDevice.TorchMode.on
             } else {
-                device.torchMode = AVCaptureDevice.TorchMode.off
+                device.torchMode = .off
             }
 
             device.unlockForConfiguration()
+            invoke.resolve()
         } catch {
-            print("Torch could not be used: \(error)")
+            invoke.reject("Torch could not be used: \(error)")
         }
     }
 }

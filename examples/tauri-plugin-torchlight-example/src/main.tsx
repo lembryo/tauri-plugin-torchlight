@@ -5,14 +5,15 @@ import { createRoot } from "react-dom/client"
 
 const root: HTMLElement | null = document.getElementById("root")
 if (root) {
-
     const click = () => {
         const error = document.getElementById("error") as HTMLDivElement
-        const button = document.getElementById("torchButton") as HTMLButtonElement
+        const button = document.getElementById(
+            "torchButton",
+        ) as HTMLButtonElement
         if (button.innerText === "Turn On") {
             button.innerText = "Turn Off"
             invoke("plugin:torchlight|torch", {
-                enabled: true
+                enabled: true,
             })
                 .then(() => {
                     error.innerText = ""
@@ -23,7 +24,7 @@ if (root) {
         } else {
             button.innerText = "Turn On"
             invoke("plugin:torchlight|torch", {
-                enabled: false
+                enabled: false,
             })
                 .then(() => {
                     error.innerText = ""
@@ -34,16 +35,21 @@ if (root) {
         }
     }
 
-    createRoot(root).render(<>
-        <div className="container">
-            <div className="title">TorchLight</div>
-            <button className="button" id="torchButton" onClick={() => {
-                click()
-            }}>
-                Turn On
-            </button>
-            <div className="error" id="error">
+    createRoot(root).render(
+        <>
+            <div className="container">
+                <div className="title">TorchLight</div>
+                <button
+                    className="button"
+                    id="torchButton"
+                    onClick={() => {
+                        click()
+                    }}
+                >
+                    Turn On
+                </button>
+                <div className="error" id="error"></div>
             </div>
-        </div>
-    </>)
+        </>,
+    )
 }

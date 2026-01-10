@@ -24,14 +24,14 @@ class TorchlightPlugin(private val activity: Activity) : Plugin(activity) {
     fun torch(invoke: Invoke) {
         val args = invoke.parseArgs(Option::class.java)
         val enabled = args.enabled
-        val cameraId: String
         val cm = activity.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
-            cameraId = cm.cameraIdList[0]
+            val cameraId = cm.cameraIdList[0]
+            cm.setTorchMode(cameraId, enabled)
+            invoke.resolve()
         } catch (e: CameraAccessException) {
             e.printStackTrace()
-            return
+            invoke.reject(e.message ?: "Camera access error")
         }
-        cm.setTorchMode(cameraId, enabled)
     }
 }

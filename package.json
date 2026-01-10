@@ -22,12 +22,12 @@
         "pretest": "pnpm build"
     },
     "dependencies": {
-        "@tauri-apps/api": "2.4.0"
+        "@tauri-apps/api": "2.9.1"
     },
     "devDependencies": {
         "license-checker": "25.0.1",
-        "prettier": "3.5.3",
+        "prettier": "3.7.4",
         "prettier-plugin-rust": "0.1.9",
-        "typescript": "5.8.2"
+        "typescript": "5.9.3"
     }
 }
