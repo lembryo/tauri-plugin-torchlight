@@ -1,4 +1,4 @@
-use tauri::{App, Manager};
+use tauri::App;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -6,10 +6,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
         ])
         .plugin(tauri_plugin_torchlight::init())
-        .setup(|app: &mut App| {
+        .setup(|_app: &mut App| {
             #[cfg(debug_assertions)]
             {
-                let window = app.get_webview_window("main").unwrap();
+                use tauri::Manager;
+                let window = _app.get_webview_window("main").unwrap();
                 window.open_devtools();
             }
             Ok(())
