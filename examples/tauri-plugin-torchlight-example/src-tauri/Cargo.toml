@@ -8,7 +8,7 @@ edition = "2024"
 rust-version = "1.85.0"
 
 [lib]
-name = "tauri_plugin_torchlight_example"
+name = "tauri_plugin_torchlight_example_lib"
 crate-type = ["staticlib", "cdylib", "lib"]
 
 [build-dependencies]
