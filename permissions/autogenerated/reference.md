@@ -7,6 +7,8 @@ Allows controlling and querying the device torch (on/off, brightness, availabili
 - `allow-torch`
 - `allow-is-available`
 - `allow-is-enabled`
+- `allow-register-listener`
+- `allow-remove-listener`
 
 ## Permission Table
 
@@ -65,6 +67,58 @@ Enables the is_enabled command without any pre-configured scope.
 <td>
 
 Denies the is_enabled command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:allow-register-listener`
+
+</td>
+<td>
+
+Enables the register_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:deny-register-listener`
+
+</td>
+<td>
+
+Denies the register_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:allow-remove-listener`
+
+</td>
+<td>
+
+Enables the remove_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:deny-remove-listener`
+
+</td>
+<td>
+
+Denies the remove_listener command without any pre-configured scope.
 
 </td>
 </tr>
