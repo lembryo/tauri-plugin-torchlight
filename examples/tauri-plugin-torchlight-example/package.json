@@ -1,28 +1,28 @@
 {
     "name": "tauri-plugin-torchlight-example",
     "private": true,
-    "version": "1.0.9",
+    "version": "1.0.10",
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "tsc && vite build",
         "preview": "vite preview",
         "tauri": "tauri"
     },
     "dependencies": {
-        "@tauri-apps/api": "2.9.1",
-        "@vitejs/plugin-react": "4.7.0",
-        "react": "19.2.3",
-        "react-dom": "19.2.3",
-        "tauri-plugin-torchlight-api": "file:../../"
+        "@tauri-apps/api": "2.11.1",
+        "react": "19.2.7",
+        "react-dom": "19.2.7",
+        "tauri-plugin-torchlight-api": "github:lembryo/tauri-plugin-torchlight"
     },
     "devDependencies": {
-        "@tauri-apps/cli": "2.9.6",
-        "@types/react": "19.2.8",
+        "@tauri-apps/cli": "2.11.4",
+        "@types/react": "19.2.17",
         "@types/react-dom": "19.2.3",
-        "license-checker": "25.0.1",
-        "prettier": "3.7.4",
+        "@vitejs/plugin-react": "4.7.0",
+        "prettier": "3.9.4",
         "prettier-plugin-rust": "0.1.9",
-        "vite": "7.3.1"
+        "typescript": "5.9.3",
+        "vite": "7.3.6"
     }
 }
