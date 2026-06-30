@@ -3033,6 +3033,7 @@ name = "tauri-plugin-torchlight"
 version = "1.0.10"
 dependencies = [
  "serde",
+ "serde_json",
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.18",
