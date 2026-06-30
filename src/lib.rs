@@ -11,7 +11,7 @@ mod models;
 
 pub use error::{Error, Result};
 
-use crate::commands::torch;
+use crate::commands::{is_available, is_enabled, torch};
 
 #[cfg(desktop)]
 use desktop::Torchlight;
@@ -32,6 +32,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("torchlight")
         .invoke_handler(tauri::generate_handler![
             torch,
+            is_available,
+            is_enabled,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]

@@ -295,6 +295,30 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the is_available command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-is-available",
+          "markdownDescription": "Enables the is_available command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the is_available command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-is-available",
+          "markdownDescription": "Denies the is_available command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the is_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-is-enabled",
+          "markdownDescription": "Enables the is_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the is_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-is-enabled",
+          "markdownDescription": "Denies the is_enabled command without any pre-configured scope."
+        },
+        {
           "description": "Enables the torch command without any pre-configured scope.",
           "type": "string",
           "const": "allow-torch",
@@ -307,10 +331,10 @@
           "markdownDescription": "Denies the torch command without any pre-configured scope."
         },
         {
-          "description": "Torchlight permissions\n#### This default permission set includes:\n\n- `allow-torch`",
+          "description": "Allows controlling and querying the device torch (on/off, brightness, availability and state).\n#### This default permission set includes:\n\n- `allow-torch`\n- `allow-is-available`\n- `allow-is-enabled`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Torchlight permissions\n#### This default permission set includes:\n\n- `allow-torch`"
+          "markdownDescription": "Allows controlling and querying the device torch (on/off, brightness, availability and state).\n#### This default permission set includes:\n\n- `allow-torch`\n- `allow-is-available`\n- `allow-is-enabled`"
         }
       ]
     }

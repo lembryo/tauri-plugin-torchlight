@@ -27,6 +27,12 @@ let package = Package(
             dependencies: [
                 .byName(name: "Tauri")
             ],
-            path: "Sources")
+            path: "Sources"),
+        .testTarget(
+            name: "PluginTests",
+            dependencies: [
+                .byName(name: "tauri-plugin-torchlight")
+            ],
+            path: "Tests/PluginTests"),
     ]
 )

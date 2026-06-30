@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.lembryo.tauri.plugin.torchlight.example"
+    namespace = "com.lembryo.tauri.plugin.torchlight"
     compileSdk = 34
 
     defaultConfig {
