@@ -3051,6 +3051,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-torchlight"
 version = "1.0.10"
+source = "git+https://github.com/lembryo/tauri-plugin-torchlight.git#271babcfd20952aadd783d03ca7b3f036a18cdb5"
 dependencies = [
  "serde",
  "tauri",

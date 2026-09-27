@@ -1,5 +1,10 @@
 # Tauri Plugin torchlight
 
+[![crates.io](https://img.shields.io/crates/v/tauri-plugin-torchlight.svg)](https://crates.io/crates/tauri-plugin-torchlight)
+[![docs.rs](https://img.shields.io/docsrs/tauri-plugin-torchlight)](https://docs.rs/tauri-plugin-torchlight)
+[![npm](https://img.shields.io/npm/v/tauri-plugin-torchlight-api.svg)](https://www.npmjs.com/package/tauri-plugin-torchlight-api)
+[![license](https://img.shields.io/crates/l/tauri-plugin-torchlight.svg)](#license)
+
 A Tauri v2 plugin to control a smartphone's flashlight (torch): turn it on/off,
 set its brightness, query availability and current state, and react to system
 torch changes.
@@ -21,13 +26,25 @@ Designed for mobile applications built with **Tauri v2** (Android & iOS).
 
 ## Installation
 
+This plugin ships as two packages that are released together and share the same
+version number:
+
+| Package | Registry | Purpose |
+| --- | --- | --- |
+| `tauri-plugin-torchlight` | [crates.io](https://crates.io/crates/tauri-plugin-torchlight) | the Rust plugin itself |
+| `tauri-plugin-torchlight-api` | [npm](https://www.npmjs.com/package/tauri-plugin-torchlight-api) | typed JavaScript/TypeScript bindings |
+
 ### Rust Setup
 
-Add the plugin to your `src-tauri/Cargo.toml`:
+```bash
+cargo add tauri-plugin-torchlight
+```
+
+Or add it to your `src-tauri/Cargo.toml` directly:
 
 ```toml
 [dependencies]
-tauri-plugin-torchlight = { git = "https://github.com/lembryo/tauri-plugin-torchlight.git" }
+tauri-plugin-torchlight = "1"
 ```
 
 ### JavaScript/TypeScript Setup
@@ -63,8 +80,10 @@ Grant the permission in `src-tauri/capabilities/default.json`:
 }
 ```
 
-The `torchlight:default` set enables `torch`, `is_available` and `is_enabled`.
-You can also grant them individually (`torchlight:allow-torch`, etc.).
+The `torchlight:default` set enables `torch`, `is_available`, `is_enabled`,
+`register_listener` and `remove_listener`. You can also grant them individually
+(`torchlight:allow-torch`, etc.) — note that `onTorchModeChanged` needs both
+`allow-register-listener` and `allow-remove-listener`.
 
 ### Using the TypeScript API
 
@@ -132,6 +151,19 @@ npm run build
 # Android unit tests (host JVM)
 cd android && ./gradlew test
 ```
+
+## Release
+
+Publishing is automated by the `publish` GitHub Actions workflow
+(`.github/workflows/publish.yml`), which runs on every push to `main`:
+
+1. Bump the version in **both** `Cargo.toml` and `package.json` (keep them in
+   sync) and merge into `main`.
+2. The workflow publishes the crate to crates.io and the bindings to npm.
+
+Versions that are already published are skipped, so merging into `main` without
+a version bump is a no-op. The workflow needs two repository secrets:
+`CARGO_TOKEN` (crates.io) and `NPM_TOKEN` (npm).
 
 ## License
 
