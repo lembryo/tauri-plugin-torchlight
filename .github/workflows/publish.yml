@@ -3,7 +3,7 @@ name: publish
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 concurrency:
@@ -19,6 +19,23 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      # `cargo publish` verifies the packaged crate by building it. On Linux that
+      # compiles the desktop target of `tauri`, which needs the GTK/WebKit system
+      # libraries (glib-2.0 and friends) to be present.
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential \
+            file \
+            libayatana-appindicator3-dev \
+            libgtk-3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            pkg-config
 
       - name: Cache cargo registry and target
         uses: Swatinem/rust-cache@v2
@@ -87,6 +104,20 @@ jobs:
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
+
+      # A 403 on publish is almost always a token problem rather than a package
+      # problem, so check the credentials separately to make the cause obvious.
+      - name: Verify npm credentials
+        if: steps.check.outputs.skip == 'false'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if ! who=$(npm whoami 2>&1); then
+            echo "::error::NPM_TOKEN could not be authenticated: $who"
+            echo "::error::Use a granular token with read+write access to ALL packages (a new package cannot be created by a token scoped to selected packages), or a classic Automation token."
+            exit 1
+          fi
+          echo "Authenticated to npm as: $who"
 
       - name: Build
         if: steps.check.outputs.skip == 'false'

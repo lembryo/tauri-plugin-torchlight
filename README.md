@@ -11,6 +11,9 @@ torch changes.
 
 Designed for mobile applications built with **Tauri v2** (Android & iOS).
 
+📖 **Documentation:** [English](https://lembryo.github.io/tauri-plugin-torchlight/en/) ·
+[日本語](https://lembryo.github.io/tauri-plugin-torchlight/ja/)
+
 ## Features
 
 - Turn the torch on or off.

@@ -4,7 +4,7 @@
     "author": "mao <mao.lembryo@gmail.com>",
     "description": "JavaScript/TypeScript bindings for tauri-plugin-torchlight: control the smartphone torch (on/off, brightness, availability, state and change events) from Tauri v2 apps on Android and iOS.",
     "license": "MIT OR Apache-2.0",
-    "homepage": "https://github.com/lembryo/tauri-plugin-torchlight#readme",
+    "homepage": "https://lembryo.github.io/tauri-plugin-torchlight/",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/lembryo/tauri-plugin-torchlight.git"
