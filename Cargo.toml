@@ -2,7 +2,7 @@
 name = "tauri-plugin-torchlight"
 version = "1.0.11"
 authors = ["mao <mao.lembryo@gmail.com>"]
-description = "Tauri v2 plugin to control the smartphone torch on Android and iOS: on/off, brightness, availability and state queries, and system torch change events."
+description = "Tauri v2 plugin to control the smartphone torch on Android and iOS: on/off, atomic toggle, brightness, capability and state queries, and system torch change events."
 edition = "2024"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
@@ -12,7 +12,7 @@ documentation = "https://docs.rs/tauri-plugin-torchlight"
 keywords = ["tauri", "plugin", "torch", "flashlight", "mobile"]
 categories = ["api-bindings", "hardware-support"]
 rust-version = "1.85.0"
-exclude = ["/examples", "/docs", "/webview-dist", "/webview-src", "/node_modules"]
+exclude = ["/docs", "/node_modules", "/dist-js"]
 links = "tauri-plugin-torchlight"
 
 [dependencies]

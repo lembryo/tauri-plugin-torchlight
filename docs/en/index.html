@@ -5,7 +5,7 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <title>tauri-plugin-torchlight — Torch / flashlight plugin for Tauri v2 (Android &amp; iOS) | Docs</title>
     <meta
-        content="tauri-plugin-torchlight lets a Tauri v2 app control the smartphone torch (flashlight) on Android and iOS: turn it on/off, set brightness, query availability and state, and react to system torch changes. Android uses CameraManager, iOS uses AVFoundation. Rust + TypeScript, MIT / Apache-2.0."
+        content="tauri-plugin-torchlight lets a Tauri v2 app control the smartphone torch (flashlight) on Android and iOS: turn it on/off, flip it atomically with toggle, set brightness, probe device capabilities, query availability and state, and react to system torch changes. Android uses CameraManager, iOS uses AVFoundation. Rust + TypeScript, MIT / Apache-2.0."
         name="description"/>
     <meta
         content="tauri-plugin-torchlight, Tauri, Tauri v2, plugin, torch, flashlight, Android, iOS, CameraManager, AVFoundation, Rust, TypeScript, mobile"
@@ -26,7 +26,7 @@
     <meta content="ja_JP" property="og:locale:alternate"/>
     <meta content="tauri-plugin-torchlight — Torch plugin for Tauri v2" property="og:title"/>
     <meta
-        content="Control the smartphone torch from Tauri v2 on Android and iOS: on/off, brightness, availability and state, plus system change events. MIT / Apache-2.0."
+        content="Control the smartphone torch from Tauri v2 on Android and iOS: on/off, atomic toggle, brightness, capability probing, availability and state, plus system change events. MIT / Apache-2.0."
         property="og:description"/>
     <meta content="https://lembryo.github.io/tauri-plugin-torchlight/en/" property="og:url"/>
 
@@ -34,7 +34,7 @@
     <meta content="summary" name="twitter:card"/>
     <meta content="tauri-plugin-torchlight — Torch plugin for Tauri v2" name="twitter:title"/>
     <meta
-        content="Control the smartphone torch from Tauri v2 on Android and iOS. Brightness, state queries and change events. MIT / Apache-2.0."
+        content="Control the smartphone torch from Tauri v2 on Android and iOS. Atomic toggle, brightness, capability probing, state queries and change events. MIT / Apache-2.0."
         name="twitter:description"/>
 
     <link href="../favicon.svg" rel="icon" type="image/svg+xml"/>
@@ -45,7 +45,7 @@
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "tauri-plugin-torchlight",
-            "description": "A Tauri v2 plugin to control the smartphone torch on Android and iOS: on/off, brightness, availability and state queries, and system torch change events.",
+            "description": "A Tauri v2 plugin to control the smartphone torch on Android and iOS: on/off, atomic toggle, brightness, capability probing, availability and state queries, and system torch change events.",
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "Android, iOS",
             "softwareVersion": "1.0.11",
@@ -113,6 +113,7 @@
                     <li><a href="#js-settorch">setTorch</a></li>
                     <li><a href="#js-isavailable">isAvailable</a></li>
                     <li><a href="#js-isenabled">isEnabled</a></li>
+                    <li><a href="#js-capabilities">capabilities</a></li>
                     <li><a href="#js-toggle">toggle</a></li>
                     <li><a href="#js-ontorchmodechanged">onTorchModeChanged</a></li>
                     <li><a href="#js-types">Type reference</a></li>
@@ -191,8 +192,18 @@
                         real flash unit exists.
                     </li>
                     <li><strong>Current state</strong> — <code>isEnabled()</code>.</li>
+                    <li><strong>Device capabilities</strong> — <code>capabilities()</code> reports whether the
+                        hardware exists, whether it is usable right now, and whether brightness control actually does
+                        anything.
+                    </li>
+                    <li><strong>Atomic flip</strong> — <code>toggle(level?)</code> does the read and the write inside
+                        the native plugin.
+                    </li>
                     <li><strong>Change events</strong> — <code>onTorchModeChanged()</code> keeps your UI correct when
                         the OS, another app, or thermal limits change the torch.
+                    </li>
+                    <li><strong>Structured errors</strong> — every rejection is a <code>TorchlightError</code> with a
+                        machine-readable <code>kind</code>, so you never have to match on message text.
                     </li>
                     <li><strong>Explicit desktop behaviour</strong> — a clear error instead of silently doing
                         nothing.
@@ -285,6 +296,7 @@ tauri-plugin-torchlight = "1"</code></pre>
     setTorch,
     isAvailable,
     isEnabled,
+    capabilities,
     toggle,
     onTorchModeChanged,
 } from "tauri-plugin-torchlight-api"
@@ -294,8 +306,14 @@ if (await isAvailable()) {
     await setTorch(true)            // full brightness
     await setTorch(true, 0.5)       // half brightness where supported
     const lit = await isEnabled()   // -&gt; true
-    await toggle()                  // flips the current state, returns the new one
+    await toggle(0.5)               // flips the current state, returns the new one
     await setTorch(false)           // off
+}
+
+// Decide whether a brightness slider is worth showing.
+const caps = await capabilities()
+if (caps.brightnessSupported) {
+    // caps.levelSteps is the step count (null on iOS, which is continuous)
 }
 
 // Stay in sync when the system changes the torch.
@@ -330,8 +348,11 @@ await listener.unregister()</code></pre>
                             <td><span class="pname">level</span><span class="opt">optional</span></td>
                             <td><span class="ptype">number</span></td>
                             <td>Brightness in the <code>0.0</code>–<code>1.0</code> range. Used only when turning on,
-                                and only on devices that support brightness control. Out-of-range values are clamped;
-                                omitting it uses full brightness.
+                                and only on devices where <a href="#js-capabilities"><code>brightnessSupported</code></a>
+                                is <code>true</code>. Out-of-range values are clamped into
+                                <code>0.01</code>–<code>1.0</code>, and non-finite values (<code>NaN</code>,
+                                <code>Infinity</code>) are treated as "no level requested". Omitting it uses full
+                                brightness.
                             </td>
                         </tr>
                         </tbody>
@@ -344,10 +365,13 @@ await listener.unregister()</code></pre>
             <section id="js-isavailable">
                 <h2>isAvailable</h2>
                 <pre data-lang="ts"><code>function isAvailable(): Promise&lt;boolean&gt;</code></pre>
-                <p>Whether the device has a controllable torch. On Android the plugin looks for a camera with a flash
-                    unit; on iOS it checks whether the default video device reports <code>hasTorch</code>. Always
+                <p>Whether the device has torch <strong>hardware</strong>. This is a static property of the device and
+                    never changes while the app runs. On Android the plugin looks for a camera with a flash unit; on
+                    iOS it checks whether the default video device reports <code>hasTorch</code>. Always
                     <code>false</code> on desktop.</p>
-                <p>Use it to decide whether to show a torch button at all.</p>
+                <p>Use it to decide whether to show a torch button at all. For "can I use it right now", read
+                    <code>usable</code> from <a href="#js-capabilities"><code>capabilities()</code></a> or follow
+                    <code>available</code> on the <code>onTorchModeChanged</code> event.</p>
             </section>
 
             <section id="js-isenabled">
@@ -358,16 +382,88 @@ await listener.unregister()</code></pre>
                     <div class="note-title">Where the Android value comes from</div>
                     On Android the value is served from a cache kept up to date by
                     <code>CameraManager.TorchCallback</code>, registered when the plugin loads. Changes made by other
-                    apps or by the OS are therefore reflected.
+                    apps or by the OS are therefore reflected. The cache is also updated the moment a
+                    <code>torch()</code> or <code>toggle()</code> call succeeds, so the value is correct without
+                    waiting for the asynchronous callback.
                 </div>
+            </section>
+
+            <section id="js-capabilities">
+                <h2>capabilities</h2>
+                <pre data-lang="ts"><code>function capabilities(): Promise&lt;TorchCapabilities&gt;</code></pre>
+                <p>Reports what this device's torch can actually do. Use it instead of <code>isAvailable()</code>
+                    whenever the UI offers a brightness control.</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">available</span></td>
+                            <td><span class="ptype">boolean</span></td>
+                            <td>Whether the device has torch hardware. Static; it never changes while the app runs.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">usable</span></td>
+                            <td><span class="ptype">boolean</span></td>
+                            <td>Whether the torch can be used <strong>right now</strong>. Goes <code>false</code> when
+                                another app takes the camera or the device is under thermal duress, and back to
+                                <code>true</code> afterwards.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">brightnessSupported</span></td>
+                            <td><span class="ptype">boolean</span></td>
+                            <td>Whether a <code>level</code> actually changes the brightness. Always <code>true</code>
+                                on iOS; on Android it is <code>false</code> below API 33 and on devices that report a
+                                single strength level.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">levelSteps</span></td>
+                            <td><span class="ptype">number | null</span></td>
+                            <td>Number of discrete brightness steps. A number on Android when brightness is supported;
+                                <code>null</code> on iOS (a continuous scale) or when there is no brightness control.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    <div class="note-title"><code>available</code> and <code>usable</code> are different questions
+                    </div>
+                    <code>available</code> means "the hardware exists"; <code>usable</code> means "it works right
+                    now". Passing a <code>level</code> on a device where <code>brightnessSupported</code> is
+                    <code>false</code> still succeeds — the torch just turns on at full power.
+                </div>
+                <pre data-lang="ts"><code>const { available, brightnessSupported, levelSteps } = await capabilities()
+
+// Never show a slider that silently does nothing
+if (available &amp;&amp; brightnessSupported) {
+    showBrightnessSlider({ steps: levelSteps ?? undefined })
+}</code></pre>
+                <p>On desktop it resolves with all four fields reporting "no torch" (<code>false</code> and
+                    <code>null</code>) instead of rejecting.</p>
             </section>
 
             <section id="js-toggle">
                 <h2>toggle</h2>
-                <pre data-lang="ts"><code>function toggle(): Promise&lt;boolean&gt;</code></pre>
-                <p>Flips the current state and returns the new one. It is a thin helper over <code>isEnabled()</code>
-                    followed by <code>setTorch()</code>, and cannot set a brightness — it always turns on at full
-                    power.</p>
+                <pre data-lang="ts"><code>function toggle(level?: number): Promise&lt;boolean&gt;</code></pre>
+                <p>Flips the torch and returns the state it ended up in (<code>true</code> = on). An optional
+                    <code>level</code> sets the brightness when the toggle turns the torch on; it is interpreted
+                    exactly as in <code>setTorch()</code>.</p>
+                <div class="note">
+                    <div class="note-title">The read and the write are atomic</div>
+                    The flip happens inside the native plugin — on Android within a <code>synchronized</code> block,
+                    on iOS on a serial <code>DispatchQueue</code>. Two concurrent <code>toggle()</code> calls cannot
+                    both observe the same starting state.
+                </div>
             </section>
 
             <section id="js-ontorchmodechanged">
@@ -379,6 +475,9 @@ await listener.unregister()</code></pre>
                     thermal limits, or the OS turning the torch off.</p>
                 <p>The returned <code>PluginListener</code> comes from <code>@tauri-apps/api/core</code>. Always call
                     <code>unregister()</code> when you are done.</p>
+                <p>On desktop the registration succeeds and the listener simply never fires — the plugin supplies
+                    no-op <code>register_listener</code> / <code>remove_listener</code> commands — so callers do not
+                    have to special-case the platform.</p>
                 <pre data-lang="ts"><code>const listener = await onTorchModeChanged(({ enabled, available }) =&gt; {
     setLit(enabled)
     setSupported(available)
@@ -389,8 +488,13 @@ await listener.unregister()</code></pre>
                 <div class="note warn">
                     <div class="note-title">Timing differs per platform</div>
                     Android uses <code>CameraManager.TorchCallback</code> (<code>onTorchModeChanged</code> and
-                    <code>onTorchModeUnavailable</code>); iOS observes <code>AVCaptureDevice.isTorchActive</code> via
-                    KVO. Note that your own <code>setTorch()</code> calls also fire the event.
+                    <code>onTorchModeUnavailable</code>); iOS observes both <code>isTorchActive</code> and
+                    <code>isTorchAvailable</code> on the <code>AVCaptureDevice</code> via KVO. Both platforms
+                    therefore emit an event when only availability changes — thermal duress while the torch is off,
+                    for instance. The event reports <em>changes</em> only: the plugin loads before your listener can
+                    exist, so anything emitted then never reaches you. Read the initial state with
+                    <code>isEnabled()</code> / <code>capabilities()</code> rather than waiting for an event. Note that
+                    your own <code>setTorch()</code> and <code>toggle()</code> calls also fire the event.
                 </div>
             </section>
 
@@ -399,8 +503,30 @@ await listener.unregister()</code></pre>
                 <pre data-lang="ts"><code>interface TorchModeChangedPayload {
     /** Whether the torch is currently lit. */
     enabled: boolean
-    /** Whether a torch is currently usable on the device. */
+    /** Whether the torch is usable *right now* (not whether hardware exists). */
     available: boolean
+}
+
+interface TorchCapabilities {
+    /** Whether the device has torch hardware. Static. */
+    available: boolean
+    /** Whether the torch can be used right now. Can change at runtime. */
+    usable: boolean
+    /** Whether a level actually changes the brightness. */
+    brightnessSupported: boolean
+    /** Discrete step count, or null for a continuous scale (iOS) / no control. */
+    levelSteps: number | null
+}
+
+type TorchErrorKind =
+    | "unsupported"    // desktop: no torch hardware on this platform
+    | "unavailable"    // this device has no usable torch
+    | "cameraAccess"   // the camera could not be accessed (Android)
+    | "torchFailed"    // the torch could not be driven, e.g. thermal duress
+    | "internal"       // anything else: IPC, serialization, a plugin bug
+
+class TorchlightError extends Error {
+    readonly kind: TorchErrorKind
 }</code></pre>
             </section>
 
@@ -424,6 +550,11 @@ await listener.unregister()</code></pre>
                             <td><span class="ptype">void</span></td>
                         </tr>
                         <tr>
+                            <td><span class="pname">plugin:torchlight|toggle</span></td>
+                            <td><span class="ptype">{ level?: number }</span></td>
+                            <td><span class="ptype">boolean</span></td>
+                        </tr>
+                        <tr>
                             <td><span class="pname">plugin:torchlight|is_available</span></td>
                             <td>—</td>
                             <td><span class="ptype">boolean</span></td>
@@ -433,12 +564,28 @@ await listener.unregister()</code></pre>
                             <td>—</td>
                             <td><span class="ptype">boolean</span></td>
                         </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|capabilities</span></td>
+                            <td>—</td>
+                            <td><span class="ptype">TorchCapabilities</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|register_listener</span></td>
+                            <td><span class="ptype">{ event: string, handler: Channel }</span></td>
+                            <td><span class="ptype">void</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|remove_listener</span></td>
+                            <td><span class="ptype">{ event: string, channelId: number }</span></td>
+                            <td><span class="ptype">void</span></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
-                <p><code>register_listener</code> and <code>remove_listener</code> are provided by Tauri itself for
-                    event subscription. They need permissions, but you never call them directly —
-                    <code>onTorchModeChanged</code> uses them internally.</p>
+                <p>Those seven are everything the plugin declares. The listener pair is handled by Tauri's mobile
+                    runtime on Android and iOS, and by no-op stand-ins this plugin registers on desktop. They need
+                    permissions, but you never call them directly — <code>onTorchModeChanged</code> uses them
+                    internally.</p>
                 <h3>Events</h3>
                 <div class="table-wrap">
                     <table class="param-table">
@@ -466,7 +613,11 @@ await listener.unregister()</code></pre>
 await invoke("plugin:torchlight|torch", { enabled: true, level: 0.5 })
 
 const available = await invoke("plugin:torchlight|is_available")
-const enabled = await invoke("plugin:torchlight|is_enabled")</code></pre>
+const enabled = await invoke("plugin:torchlight|is_enabled")
+const caps = await invoke("plugin:torchlight|capabilities")
+const next = await invoke("plugin:torchlight|toggle", { level: 0.5 })</code></pre>
+                <p>Going this way, a rejection arrives as a raw <code>{ kind, message }</code> object — the npm
+                    package is what wraps it into a <code>TorchlightError</code>.</p>
                 <p>Subscribe to the event with <code>addPluginListener</code>:</p>
                 <pre data-lang="js"><code>import { addPluginListener } from "@tauri-apps/api/core"
 
@@ -477,11 +628,13 @@ const listener = await addPluginListener("torchlight", "torchModeChanged", (payl
 
             <section id="permissions">
                 <h2>Permissions (capabilities)</h2>
-                <p><code>torchlight:default</code> includes these five:</p>
+                <p><code>torchlight:default</code> includes these seven:</p>
                 <ul class="bullets">
                     <li><code>allow-torch</code></li>
+                    <li><code>allow-toggle</code></li>
                     <li><code>allow-is-available</code></li>
                     <li><code>allow-is-enabled</code></li>
+                    <li><code>allow-capabilities</code></li>
                     <li><code>allow-register-listener</code></li>
                     <li><code>allow-remove-listener</code></li>
                 </ul>
@@ -499,6 +652,7 @@ const listener = await addPluginListener("torchlight", "torchModeChanged", (payl
     "permissions": [
         "torchlight:allow-is-available",
         "torchlight:allow-is-enabled",
+        "torchlight:allow-capabilities",
         "torchlight:allow-register-listener",
         "torchlight:allow-remove-listener"
     ]
@@ -511,12 +665,20 @@ const listener = await addPluginListener("torchlight", "torchModeChanged", (payl
                 <p>Builds the plugin; pass it to <code>tauri::Builder::plugin()</code>. On mobile it registers the
                     native plugin (<code>TorchlightPlugin</code> on Android, <code>init_plugin_torchlight</code> on
                     iOS); on desktop it registers the stub implementation.</p>
+                <p>Registration is no longer <code>unwrap()</code>ed. When the native class genuinely cannot be
+                    loaded — stripped by R8, a stale AAR, a package rename — the failure propagates to the caller
+                    instead of panicking the app during setup.</p>
+                <p>On desktop, <code>init()</code> also registers no-op <code>register_listener</code> /
+                    <code>remove_listener</code> commands, so <code>addPluginListener</code> does not reject with
+                    "command not found".</p>
             </section>
 
             <section id="rust-ext">
                 <h2>TorchlightExt</h2>
                 <p>To drive the torch from Rust, use the extension trait available on any
-                    <code>Manager</code> (such as <code>AppHandle</code>).</p>
+                    <code>Manager</code> (such as <code>AppHandle</code>). The trait itself has a single method,
+                    <code>fn torchlight(&amp;self) -&gt; &amp;Torchlight&lt;R&gt;</code>; the handle it returns is
+                    what exposes the operations below.</p>
                 <pre data-lang="rust"><code>use tauri_plugin_torchlight::TorchlightExt;
 
 #[tauri::command]
@@ -550,21 +712,49 @@ async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;(
                             <td><span class="pname">is_enabled</span></td>
                             <td><span class="ptype">fn is_enabled(&amp;self) -&gt; Result&lt;bool&gt;</span></td>
                         </tr>
+                        <tr>
+                            <td><span class="pname">toggle</span></td>
+                            <td><span class="ptype">fn toggle(&amp;self, level: Option&lt;f64&gt;) -&gt; Result&lt;bool&gt;</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">capabilities</span></td>
+                            <td><span class="ptype">fn capabilities(&amp;self) -&gt; Result&lt;TorchCapabilities&gt;</span>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
+                <p>The crate also re-exports <code>Error</code>, <code>Result</code>,
+                    <code>TorchCapabilities</code>, <code>TorchRequest</code>, <code>ToggleRequest</code>,
+                    <code>AvailabilityResponse</code>, <code>EnabledResponse</code> and the
+                    <code>MIN_LEVEL</code> constant (<code>0.01</code>).</p>
             </section>
 
             <section id="rust-error">
                 <h2>Error</h2>
-                <pre data-lang="rust"><code>pub enum Error {
+                <pre data-lang="rust"><code>#[non_exhaustive]
+pub enum Error {
     /// The native mobile plugin returned an error (mobile only)
     PluginInvoke(tauri::plugin::mobile::PluginInvokeError),
     /// No torch hardware exists on desktop (desktop only)
     Unsupported,
+}
+
+impl Error {
+    /// A stable, machine-readable discriminator: "unsupported",
+    /// "unavailable", "cameraAccess", "torchFailed" or "internal".
+    pub fn kind(&amp;self) -&gt; String;
+    /// The human-readable message.
+    pub fn message(&amp;self) -&gt; String;
 }</code></pre>
-                <p><code>Error</code> serializes to a string, so the JS side receives a human-readable rejection
-                    value. The desktop <code>Unsupported</code> message is:</p>
+                <p>The variants are platform-partitioned, so Rust consumers that match on this enum must either
+                    handle the <code>_</code> arm or gate their arms on <code>cfg(mobile)</code> /
+                    <code>cfg(desktop)</code>. <code>#[non_exhaustive]</code> makes that requirement explicit and
+                    leaves room for future variants.</p>
+                <p><code>Error</code> serializes as <code>{ "kind": "...", "message": "..." }</code>, and the JS
+                    bindings turn that into a <a href="#recipe-errors"><code>TorchlightError</code></a>. The desktop
+                    <code>Unsupported</code> message is:</p>
                 <pre data-lang="text"><code>torchlight is only supported on Android and iOS; this is a desktop platform</code></pre>
             </section>
 
@@ -606,10 +796,28 @@ async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;(
                             <td><span class="plat">Always false</span></td>
                         </tr>
                         <tr>
+                            <td><code>toggle</code></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat no">Error</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>capabilities</code></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat">All false</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>levelSteps</code></td>
+                            <td><span class="plat ok">API 33+</span></td>
+                            <td><span class="plat">null (continuous)</span></td>
+                            <td><span class="plat">null</span></td>
+                        </tr>
+                        <tr>
                             <td><code>torchModeChanged</code></td>
                             <td><span class="plat ok">Yes</span></td>
                             <td><span class="plat ok">Yes</span></td>
-                            <td><span class="plat">Never fires</span></td>
+                            <td><span class="plat">Registers, never fires</span></td>
                         </tr>
                         </tbody>
                     </table>
@@ -626,11 +834,28 @@ async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;(
                     </li>
                     <li>A <code>0.0</code>–<code>1.0</code> level is mapped onto the device's <code>1..maxLevel</code>
                         range. The result is always at least <code>1</code>, so <code>setTorch(true, 0.0)</code> does
-                        not turn the torch off.
+                        not turn the torch off. That <code>maxLevel</code> is what <code>levelSteps</code> reports.
                     </li>
-                    <li>The camera used is the first one whose <code>FLASH_INFO_AVAILABLE</code> is <code>true</code>
-                        (usually the rear one). If none is found, <code>isAvailable()</code> returns
-                        <code>false</code> and <code>torch</code> rejects.
+                    <li>The camera used is a <strong>back-facing</strong> one (<code>LENS_FACING_BACK</code>) with a
+                        flash unit (<code>FLASH_INFO_AVAILABLE</code>), falling back to any camera that has one.
+                        Relying on <code>cameraIdList</code> ordering alone can pick a flash-capable front or
+                        auxiliary camera on multi-camera devices. If no camera has a flash,
+                        <code>isAvailable()</code> returns <code>false</code> and <code>torch</code> rejects.
+                    </li>
+                    <li><code>toggle()</code> reads and writes inside <code>synchronized(torchLock)</code>.</li>
+                    <li>The cached torch state is updated optimistically the moment a <code>torch()</code> or
+                        <code>toggle()</code> call succeeds, because <code>TorchCallback</code> is delivered
+                        asynchronously on the main looper. Waiting for it would make <code>isEnabled()</code> lie
+                        immediately after a successful call.
+                    </li>
+                    <li>Registering the <code>TorchCallback</code> in <code>load()</code> also delivers the current
+                        mode once, which seeds that cache — so <code>isEnabled()</code> is right even on a cold
+                        start with the torch already lit. The event that seeding emits is discarded, because
+                        <code>load()</code> runs before the webview can register a listener.
+                    </li>
+                    <li>The <code>TorchCallback</code> is unregistered in <code>onDestroy</code>. It registers into a
+                        process-scoped singleton that holds the plugin — and therefore the Activity — alive, so
+                        without this the Activity leaks and a re-created plugin emits duplicate events.
                     </li>
                     <li>No <code>CAMERA</code> runtime permission is needed.</li>
                     <li>Requires <code>minSdk 23</code>.</li>
@@ -647,7 +872,26 @@ async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;(
                         above, <code>AVCaptureMaxAvailableTorchLevel</code> is used instead, because passing exactly
                         <code>1.0</code> can throw.
                     </li>
-                    <li>Omitting <code>level</code> means full brightness. Out-of-range values are clamped.</li>
+                    <li>Omitting <code>level</code>, or passing a non-finite one, means full brightness.
+                        Out-of-range values are clamped into <code>TorchMath.minLevel</code> (<code>0.01</code>) to
+                        <code>1.0</code>.
+                    </li>
+                    <li><code>setTorchModeOn(level: 0.0)</code> raises an Objective-C
+                        <code>NSInvalidArgumentException</code>, which Swift <code>do</code>/<code>catch</code>
+                        cannot catch and which terminates the process. Flooring at <code>minLevel</code> prevents
+                        that and gives both platforms the same contract: <code>0</code> means "as dim as possible",
+                        never "off".
+                    </li>
+                    <li><code>toggle()</code>'s read-modify-write, and the configuration lock, run on a serial
+                        <code>DispatchQueue</code>.
+                    </li>
+                    <li>The event observes both <code>isTorchActive</code> and <code>isTorchAvailable</code> via KVO.
+                        Nothing is emitted at <code>load()</code> — no listener can exist yet — and iOS reads its
+                        state straight off the device, so there is no cache to seed.
+                    </li>
+                    <li>Brightness is a continuous scale, so <code>brightnessSupported</code> is always
+                        <code>true</code> and <code>levelSteps</code> is always <code>null</code>.
+                    </li>
                     <li>Under thermal pressure the call can fail (for example
                         <code>AVErrorTorchLevelUnavailable</code>) and the promise rejects.
                     </li>
@@ -665,8 +909,14 @@ async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;(
                 <p>Desktop machines have no torch hardware, so the plugin is explicit rather than silently pretending
                     to succeed.</p>
                 <ul class="bullets">
-                    <li><code>setTorch()</code> rejects with the <code>Unsupported</code> error.</li>
+                    <li><code>setTorch()</code> and <code>toggle()</code> reject with the <code>Unsupported</code>
+                        error (<code>kind: "unsupported"</code>).
+                    </li>
                     <li><code>isAvailable()</code> and <code>isEnabled()</code> return <code>false</code>.</li>
+                    <li><code>capabilities()</code> resolves with <code>{ available: false, usable: false,
+                        brightnessSupported: false, levelSteps: null }</code>.
+                    </li>
+                    <li><code>onTorchModeChanged()</code> registers successfully and never fires.</li>
                 </ul>
                 <p>As long as you branch on <code>isAvailable()</code>, running on desktop during development will
                     not break your UI.</p>
@@ -718,14 +968,24 @@ export function TorchButton() {
 
             <section id="recipe-brightness">
                 <h2>Working with brightness</h2>
-                <p>There is no API to ask whether brightness control is supported. Passing a <code>level</code> is
-                    always safe: devices without support simply turn on at full power rather than failing.</p>
+                <p>Passing a <code>level</code> is always safe: devices without support simply turn on at full power
+                    rather than failing.</p>
                 <pre data-lang="ts"><code>// 30% where supported, full brightness elsewhere
 await setTorch(true, 0.3)</code></pre>
+                <p>Before building the UI, though, ask <a href="#js-capabilities"><code>capabilities()</code></a>, so
+                    you never show a slider that silently does nothing.</p>
+                <pre data-lang="ts"><code>const caps = await capabilities()
+if (caps.brightnessSupported) {
+    // A numeric levelSteps lets you snap the slider to the device's steps
+    showBrightnessSlider({ steps: caps.levelSteps ?? undefined })
+}</code></pre>
                 <div class="note warn">
                     <div class="note-title"><code>level: 0</code> does not turn the torch off</div>
-                    <code>setTorch(true, 0)</code> means "turn on at the lowest possible brightness". To turn the
-                    torch off, always use <code>setTorch(false)</code>.
+                    <code>setTorch(true, 0)</code> means "turn on, as dim as this device allows". That is the
+                    contract on both Android and iOS — <code>0</code> is never "off". To turn the torch off, always
+                    use <code>setTorch(false)</code>. Out-of-range values are clamped into
+                    <code>0.01</code>–<code>1.0</code>, and non-finite values (<code>NaN</code>,
+                    <code>Infinity</code>) count as "no level requested", i.e. full brightness.
                 </div>
                 <p>To change brightness while the torch is already lit, call again with
                     <code>enabled: true</code> and a different level.</p>
@@ -735,44 +995,82 @@ await setTorch(true, 0.8) // changes brightness without turning off</code></pre>
 
             <section id="recipe-errors">
                 <h2>Error handling</h2>
-                <p>The main cases where <code>setTorch()</code> rejects:</p>
+                <p>Every function in this API rejects with a <code>TorchlightError</code>. It extends
+                    <code>Error</code>, so <code>e instanceof Error</code> holds, and it carries a machine-readable
+                    <code>kind</code> to branch on.</p>
+                <pre data-lang="ts"><code>import { setTorch, TorchlightError } from "tauri-plugin-torchlight-api"
+
+try {
+    await setTorch(true)
+} catch (e) {
+    if (e instanceof TorchlightError) {
+        switch (e.kind) {
+            case "unsupported":
+                // Desktop — the right fix is not to show the button at all
+                break
+            case "unavailable":
+                toast("This device has no torch")
+                break
+            case "cameraAccess":
+                toast("Close the other app that is using the camera")
+                break
+            case "torchFailed":
+                toast("The torch could not be used — the device may be hot")
+                break
+            case "internal":
+                console.error(e.message)
+                break
+        }
+    } else {
+        throw e
+    }
+}</code></pre>
+                <p>The main cases where <code>setTorch()</code> and <code>toggle()</code> reject, and the
+                    <code>kind</code> each one carries:</p>
                 <div class="table-wrap">
                     <table class="param-table">
                         <thead>
                         <tr>
                             <th>Situation</th>
+                            <th>kind</th>
                             <th>Message</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
                             <td>Running on desktop</td>
+                            <td><code>unsupported</code></td>
                             <td><code>torchlight is only supported on Android and iOS; this is a desktop platform</code>
                             </td>
                         </tr>
                         <tr>
                             <td>Device has no flash unit</td>
+                            <td><code>unavailable</code></td>
                             <td><code>Torch is not available on this device</code></td>
                         </tr>
                         <tr>
                             <td>Android cannot access the camera</td>
+                            <td><code>cameraAccess</code></td>
                             <td>The <code>CameraAccessException</code> message, or <code>Camera access error</code>
                             </td>
                         </tr>
                         <tr>
-                            <td>iOS fails to light the torch (thermal limits, etc.)</td>
-                            <td><code>Torch could not be used: ...</code></td>
+                            <td>The torch could not be driven (thermal limits, etc.) — Android or iOS</td>
+                            <td><code>torchFailed</code></td>
+                            <td><code>Torch could not be used: ...</code> on iOS; the exception message or
+                                <code>The torch could not be used</code> on Android
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>A missing ACL permission, an IPC failure, or a plugin bug</td>
+                            <td><code>internal</code></td>
+                            <td>Whatever string Tauri rejected with</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-                <pre data-lang="ts"><code>try {
-    await setTorch(true)
-} catch (e) {
-    // arrives as a string
-    console.warn("could not turn the torch on:", e)
-}</code></pre>
-                <p>Prefer branching on <code>isAvailable()</code> up front over matching on message text.</p>
+                <p>The message is for humans and is not a stable API — always branch on <code>kind</code>, and
+                    better still, check <code>isAvailable()</code> or <code>capabilities()</code> up front.</p>
             </section>
 
             <section id="limitations">
@@ -783,10 +1081,6 @@ await setTorch(true, 0.8) // changes brightness without turning off</code></pre>
                         <li>No built-in strobe or blink patterns — drive <code>setTorch()</code> from your own timer
                             if you need them.
                         </li>
-                        <li>No API to query whether brightness control is supported (it falls back to full
-                            brightness).
-                        </li>
-                        <li>No camera selection — the first camera with a flash unit is used.</li>
                         <li>On Android, brightness only works on API 33 and later.</li>
                     </ul>
                 </div>
@@ -804,7 +1098,8 @@ await setTorch(true, 0.8) // changes brightness without turning off</code></pre>
                 <h3>Brightness changes have no visible effect</h3>
                 <p>Android 12 and earlier, and devices whose
                     <code>FLASH_INFO_STRENGTH_MAXIMUM_LEVEL</code> is <code>1</code>, do not support brightness
-                    control. Turning on at full power is the documented fallback.</p>
+                    control. Turning on at full power is the documented fallback. Check
+                    <code>brightnessSupported</code> from <code>capabilities()</code> to detect this up front.</p>
                 <h3>The torch went off when I opened another app</h3>
                 <p>Another app took the camera, or the OS turned it off. Subscribe to
                     <code>onTorchModeChanged</code> to keep the UI correct.</p>
@@ -816,6 +1111,12 @@ await setTorch(true, 0.8) // changes brightness without turning off</code></pre>
                     <code>tauri-plugin-torchlight-api</code> on npm are published together under the same version
                     number. A push to <code>main</code> triggers the GitHub Actions workflow that publishes both;
                     versions that already exist are skipped.</p>
+                <p>A test gate runs first: <code>cargo clippy --all-targets -- -D warnings</code>,
+                    <code>cargo test</code>, <code>npm run build</code>, and a check that the <code>Cargo.toml</code>
+                    and <code>package.json</code> versions agree. Nothing is published if any of them fails.</p>
+                <p>Publishing then goes to <strong>npm first and crates.io second</strong>. npm allows an unpublish
+                    within 72 hours, while a crates.io yank does not un-publish, so this order means a failure
+                    cannot leave a half-release behind.</p>
                 <p>The project is dual licensed under MIT and Apache-2.0, at your option.</p>
             </section>
 

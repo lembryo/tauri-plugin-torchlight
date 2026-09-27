@@ -6,7 +6,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Host-side unit tests for the pure torch math. Run with `./gradlew test`.
+ * Host-side unit tests for the pure torch math.
+ *
+ * Run them from the driver app's generated Android project, which ships a Gradle
+ * wrapper: `cd src-tauri/gen/android && ./gradlew :tauri-plugin-torchlight:test`.
  */
 class TorchMathTest {
 
@@ -34,8 +37,16 @@ class TorchMathTest {
     }
 
     @Test
+    fun nonFiniteLevelsStillProduceAValidOnStrength() {
+        assertEquals(1, TorchMath.strengthFromLevel(Double.NaN, 5))
+        assertEquals(5, TorchMath.strengthFromLevel(Double.POSITIVE_INFINITY, 5))
+        assertEquals(1, TorchMath.strengthFromLevel(Double.NEGATIVE_INFINITY, 5))
+    }
+
+    @Test
     fun devicesWithoutBrightnessControlReturnPlainOn() {
         assertEquals(1, TorchMath.strengthFromLevel(0.5, 1))
+        assertEquals(1, TorchMath.strengthFromLevel(0.5, 0))
         assertFalse(TorchMath.supportsBrightness(1))
         assertFalse(TorchMath.supportsBrightness(0))
     }

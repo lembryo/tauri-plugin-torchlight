@@ -1,12 +1,14 @@
 ## Default Permission
 
-Allows controlling and querying the device torch (on/off, brightness, availability and state).
+Allows controlling and querying the device torch (on/off, toggle, brightness, capabilities, availability and state).
 
 #### This default permission set includes the following:
 
 - `allow-torch`
+- `allow-toggle`
 - `allow-is-available`
 - `allow-is-enabled`
+- `allow-capabilities`
 - `allow-register-listener`
 - `allow-remove-listener`
 
@@ -18,6 +20,32 @@ Allows controlling and querying the device torch (on/off, brightness, availabili
 <th>Description</th>
 </tr>
 
+
+<tr>
+<td>
+
+`torchlight:allow-capabilities`
+
+</td>
+<td>
+
+Enables the capabilities command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:deny-capabilities`
+
+</td>
+<td>
+
+Denies the capabilities command without any pre-configured scope.
+
+</td>
+</tr>
 
 <tr>
 <td>
@@ -119,6 +147,32 @@ Enables the remove_listener command without any pre-configured scope.
 <td>
 
 Denies the remove_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:allow-toggle`
+
+</td>
+<td>
+
+Enables the toggle command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`torchlight:deny-toggle`
+
+</td>
+<td>
+
+Denies the toggle command without any pre-configured scope.
 
 </td>
 </tr>
