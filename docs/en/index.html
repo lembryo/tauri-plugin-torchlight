@@ -1,0 +1,840 @@
+<!doctype html>
+<html data-lang="en" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>tauri-plugin-torchlight — Torch / flashlight plugin for Tauri v2 (Android &amp; iOS) | Docs</title>
+    <meta
+        content="tauri-plugin-torchlight lets a Tauri v2 app control the smartphone torch (flashlight) on Android and iOS: turn it on/off, set brightness, query availability and state, and react to system torch changes. Android uses CameraManager, iOS uses AVFoundation. Rust + TypeScript, MIT / Apache-2.0."
+        name="description"/>
+    <meta
+        content="tauri-plugin-torchlight, Tauri, Tauri v2, plugin, torch, flashlight, Android, iOS, CameraManager, AVFoundation, Rust, TypeScript, mobile"
+        name="keywords"/>
+    <meta content="mao" name="author"/>
+    <meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/>
+    <meta content="#f59e0b" name="theme-color"/>
+
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/en/" rel="canonical"/>
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/en/" hreflang="en" rel="alternate"/>
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/ja/" hreflang="ja" rel="alternate"/>
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/" hreflang="x-default" rel="alternate"/>
+
+    <!-- Open Graph -->
+    <meta content="website" property="og:type"/>
+    <meta content="tauri-plugin-torchlight" property="og:site_name"/>
+    <meta content="en_US" property="og:locale"/>
+    <meta content="ja_JP" property="og:locale:alternate"/>
+    <meta content="tauri-plugin-torchlight — Torch plugin for Tauri v2" property="og:title"/>
+    <meta
+        content="Control the smartphone torch from Tauri v2 on Android and iOS: on/off, brightness, availability and state, plus system change events. MIT / Apache-2.0."
+        property="og:description"/>
+    <meta content="https://lembryo.github.io/tauri-plugin-torchlight/en/" property="og:url"/>
+
+    <!-- Twitter Card -->
+    <meta content="summary" name="twitter:card"/>
+    <meta content="tauri-plugin-torchlight — Torch plugin for Tauri v2" name="twitter:title"/>
+    <meta
+        content="Control the smartphone torch from Tauri v2 on Android and iOS. Brightness, state queries and change events. MIT / Apache-2.0."
+        name="twitter:description"/>
+
+    <link href="../favicon.svg" rel="icon" type="image/svg+xml"/>
+    <link href="../styles.css" rel="stylesheet"/>
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "tauri-plugin-torchlight",
+            "description": "A Tauri v2 plugin to control the smartphone torch on Android and iOS: on/off, brightness, availability and state queries, and system torch change events.",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Android, iOS",
+            "softwareVersion": "1.0.11",
+            "programmingLanguage": ["Rust", "TypeScript", "Kotlin", "Swift"],
+            "url": "https://lembryo.github.io/tauri-plugin-torchlight/",
+            "downloadUrl": "https://crates.io/crates/tauri-plugin-torchlight",
+            "sameAs": [
+                "https://github.com/lembryo/tauri-plugin-torchlight",
+                "https://crates.io/crates/tauri-plugin-torchlight",
+                "https://www.npmjs.com/package/tauri-plugin-torchlight-api"
+            ],
+            "license": "https://opensource.org/licenses/MIT",
+            "author": {
+                "@type": "Person",
+                "name": "mao",
+                "email": "mao.lembryo@gmail.com"
+            },
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "inLanguage": "en"
+        }
+    </script>
+</head>
+<body>
+<header class="site-header">
+    <button aria-label="Menu" class="menu-toggle" id="menuToggle">☰</button>
+    <a class="brand" href="./">
+        <span class="logo">T</span>
+        <span>torchlight</span>
+        <span class="ver">v1.0.11</span>
+    </a>
+    <span class="spacer"></span>
+    <div class="lang-switch">
+        <a data-lang="ja" data-lang-link href="../ja/">日本語</a>
+        <a class="active" href="./">EN</a>
+    </div>
+    <nav class="header-links">
+        <a href="https://crates.io/crates/tauri-plugin-torchlight" rel="noopener" target="_blank">crates.io</a>
+        <a href="https://www.npmjs.com/package/tauri-plugin-torchlight-api" rel="noopener" target="_blank">npm</a>
+        <a href="https://github.com/lembryo/tauri-plugin-torchlight" rel="noopener" target="_blank">GitHub</a>
+    </nav>
+</header>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="layout">
+    <aside class="sidebar" id="sidebar">
+        <nav>
+            <div class="nav-group">
+                <button class="group-title">Getting started<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#requirements">Requirements</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#setup">Setup</a></li>
+                    <li><a href="#quickstart">Quick start</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">JavaScript API<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#js-settorch">setTorch</a></li>
+                    <li><a href="#js-isavailable">isAvailable</a></li>
+                    <li><a href="#js-isenabled">isEnabled</a></li>
+                    <li><a href="#js-toggle">toggle</a></li>
+                    <li><a href="#js-ontorchmodechanged">onTorchModeChanged</a></li>
+                    <li><a href="#js-types">Type reference</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">Commands &amp; permissions<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#commands">Command list</a></li>
+                    <li><a href="#raw-invoke">Using raw invoke</a></li>
+                    <li><a href="#permissions">Permissions (capabilities)</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">Rust API<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#rust-init">init</a></li>
+                    <li><a href="#rust-ext">TorchlightExt</a></li>
+                    <li><a href="#rust-error">Error</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">Platforms<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#platform-matrix">Support matrix</a></li>
+                    <li><a href="#platform-android">Android</a></li>
+                    <li><a href="#platform-ios">iOS</a></li>
+                    <li><a href="#platform-desktop">Desktop</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">Guides<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#recipe-ui">Keeping the UI in sync</a></li>
+                    <li><a href="#recipe-brightness">Working with brightness</a></li>
+                    <li><a href="#recipe-errors">Error handling</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">Reference<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#limitations">Limitations</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#release">Releases and versioning</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <div class="content-inner">
+            <h1>tauri-plugin-torchlight</h1>
+            <p class="lead">A Tauri v2 plugin to control a smartphone's torch (flashlight): turn it on and off, set its
+                brightness, query availability and current state, and react to torch changes coming from the system.
+                Android and iOS.</p>
+
+            <p style="margin:0 0 28px">
+                <a href="https://github.com/lembryo/tauri-plugin-torchlight" rel="noopener" target="_blank"
+                   style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:700;text-decoration:none;padding:9px 18px;border-radius:8px">
+                    View on GitHub
+                </a>
+                <span style="color:var(--text-faint);font-size:13px;margin-left:12px">Dual licensed MIT / Apache-2.0</span>
+            </p>
+
+            <section id="overview">
+                <h2>Overview</h2>
+                <p>This plugin exposes a small API for using the camera flash unit as a flashlight from a Tauri v2
+                    mobile app. It ships as two packages: the Rust plugin with its commands, and typed
+                    JavaScript/TypeScript bindings.</p>
+                <ul class="bullets">
+                    <li><strong>On and off</strong> — <code>setTorch(true)</code> / <code>setTorch(false)</code>.</li>
+                    <li><strong>Brightness</strong> — a <code>0.0</code>–<code>1.0</code> level, honoured on devices
+                        that support it (iOS, and Android 13+). Elsewhere the torch simply turns on at full power.
+                    </li>
+                    <li><strong>Availability</strong> — <code>isAvailable()</code> reports whether a camera with a
+                        real flash unit exists.
+                    </li>
+                    <li><strong>Current state</strong> — <code>isEnabled()</code>.</li>
+                    <li><strong>Change events</strong> — <code>onTorchModeChanged()</code> keeps your UI correct when
+                        the OS, another app, or thermal limits change the torch.
+                    </li>
+                    <li><strong>Explicit desktop behaviour</strong> — a clear error instead of silently doing
+                        nothing.
+                    </li>
+                </ul>
+                <div class="note">
+                    <div class="note-title">Two packages</div>
+                    <code>tauri-plugin-torchlight</code> (crates.io) and <code>tauri-plugin-torchlight-api</code>
+                    (npm) are released together and always share the same version number.
+                </div>
+            </section>
+
+            <section id="requirements">
+                <h2>Requirements</h2>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Requirement</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">Tauri</span></td>
+                            <td>v2</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">Rust</span></td>
+                            <td>1.85.0 or later (edition 2024)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">Android</span></td>
+                            <td><code>minSdk 23</code>; brightness needs API 33 (Android 13) or later</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">iOS</span></td>
+                            <td>iOS 13 or later</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">@tauri-apps/api</span></td>
+                            <td>v2 (dependency of the JS bindings)</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2>Installation</h2>
+                <h3>Rust</h3>
+                <pre data-lang="bash"><code>cargo add tauri-plugin-torchlight</code></pre>
+                <p>Or add it to <code>src-tauri/Cargo.toml</code> directly:</p>
+                <pre data-lang="toml"><code>[dependencies]
+tauri-plugin-torchlight = "1"</code></pre>
+
+                <h3>JavaScript / TypeScript</h3>
+                <p>Optional but recommended — it gives you typed helpers instead of raw <code>invoke</code> calls.</p>
+                <pre data-lang="bash"><code>npm install tauri-plugin-torchlight-api</code></pre>
+            </section>
+
+            <section id="setup">
+                <h2>Setup</h2>
+                <p>Register the plugin in <code>src-tauri/src/lib.rs</code>:</p>
+                <pre data-lang="rust"><code>fn main() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_torchlight::init()) // Add this line
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}</code></pre>
+                <p>Then grant the permission in <code>src-tauri/capabilities/default.json</code>:</p>
+                <pre data-lang="json"><code>{
+    "permissions": [
+        "torchlight:default"
+    ]
+}</code></pre>
+                <div class="note">
+                    <div class="note-title">Android permissions</div>
+                    No <code>CAMERA</code> permission is required. The plugin uses
+                    <code>CameraManager.setTorchMode</code>, so there is no runtime permission prompt. The manifest
+                    only declares <code>android.hardware.camera.flash</code> with
+                    <code>required="false"</code>, which keeps the app installable on devices without a flash unit
+                    (<code>isAvailable()</code> returns <code>false</code> there).
+                </div>
+            </section>
+
+            <section id="quickstart">
+                <h2>Quick start</h2>
+                <pre data-lang="ts"><code>import {
+    setTorch,
+    isAvailable,
+    isEnabled,
+    toggle,
+    onTorchModeChanged,
+} from "tauri-plugin-torchlight-api"
+
+// Check support before showing a torch button.
+if (await isAvailable()) {
+    await setTorch(true)            // full brightness
+    await setTorch(true, 0.5)       // half brightness where supported
+    const lit = await isEnabled()   // -&gt; true
+    await toggle()                  // flips the current state, returns the new one
+    await setTorch(false)           // off
+}
+
+// Stay in sync when the system changes the torch.
+const listener = await onTorchModeChanged(({ enabled, available }) =&gt; {
+    console.log("torch:", enabled, "available:", available)
+})
+
+// Later, when you are done:
+await listener.unregister()</code></pre>
+            </section>
+
+            <section id="js-settorch">
+                <h2>setTorch</h2>
+                <pre data-lang="ts"><code>function setTorch(enabled: boolean, level?: number): Promise&lt;void&gt;</code></pre>
+                <p>Turns the torch on or off.</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">enabled</span><span class="req">required</span></td>
+                            <td><span class="ptype">boolean</span></td>
+                            <td><code>true</code> turns the torch on, <code>false</code> turns it off.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">level</span><span class="opt">optional</span></td>
+                            <td><span class="ptype">number</span></td>
+                            <td>Brightness in the <code>0.0</code>–<code>1.0</code> range. Used only when turning on,
+                                and only on devices that support brightness control. Out-of-range values are clamped;
+                                omitting it uses full brightness.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Rejects on devices without a torch and on desktop. See <a href="#recipe-errors">error handling</a>.
+                </p>
+            </section>
+
+            <section id="js-isavailable">
+                <h2>isAvailable</h2>
+                <pre data-lang="ts"><code>function isAvailable(): Promise&lt;boolean&gt;</code></pre>
+                <p>Whether the device has a controllable torch. On Android the plugin looks for a camera with a flash
+                    unit; on iOS it checks whether the default video device reports <code>hasTorch</code>. Always
+                    <code>false</code> on desktop.</p>
+                <p>Use it to decide whether to show a torch button at all.</p>
+            </section>
+
+            <section id="js-isenabled">
+                <h2>isEnabled</h2>
+                <pre data-lang="ts"><code>function isEnabled(): Promise&lt;boolean&gt;</code></pre>
+                <p>Whether the torch is currently lit. Always <code>false</code> on desktop.</p>
+                <div class="note">
+                    <div class="note-title">Where the Android value comes from</div>
+                    On Android the value is served from a cache kept up to date by
+                    <code>CameraManager.TorchCallback</code>, registered when the plugin loads. Changes made by other
+                    apps or by the OS are therefore reflected.
+                </div>
+            </section>
+
+            <section id="js-toggle">
+                <h2>toggle</h2>
+                <pre data-lang="ts"><code>function toggle(): Promise&lt;boolean&gt;</code></pre>
+                <p>Flips the current state and returns the new one. It is a thin helper over <code>isEnabled()</code>
+                    followed by <code>setTorch()</code>, and cannot set a brightness — it always turns on at full
+                    power.</p>
+            </section>
+
+            <section id="js-ontorchmodechanged">
+                <h2>onTorchModeChanged</h2>
+                <pre data-lang="ts"><code>function onTorchModeChanged(
+    handler: (payload: TorchModeChangedPayload) =&gt; void,
+): Promise&lt;PluginListener&gt;</code></pre>
+                <p>Registers a listener for torch changes coming from the system: another app taking the camera,
+                    thermal limits, or the OS turning the torch off.</p>
+                <p>The returned <code>PluginListener</code> comes from <code>@tauri-apps/api/core</code>. Always call
+                    <code>unregister()</code> when you are done.</p>
+                <pre data-lang="ts"><code>const listener = await onTorchModeChanged(({ enabled, available }) =&gt; {
+    setLit(enabled)
+    setSupported(available)
+})
+
+// e.g. when the component unmounts
+await listener.unregister()</code></pre>
+                <div class="note warn">
+                    <div class="note-title">Timing differs per platform</div>
+                    Android uses <code>CameraManager.TorchCallback</code> (<code>onTorchModeChanged</code> and
+                    <code>onTorchModeUnavailable</code>); iOS observes <code>AVCaptureDevice.isTorchActive</code> via
+                    KVO. Note that your own <code>setTorch()</code> calls also fire the event.
+                </div>
+            </section>
+
+            <section id="js-types">
+                <h2>Type reference</h2>
+                <pre data-lang="ts"><code>interface TorchModeChangedPayload {
+    /** Whether the torch is currently lit. */
+    enabled: boolean
+    /** Whether a torch is currently usable on the device. */
+    available: boolean
+}</code></pre>
+            </section>
+
+            <section id="commands">
+                <h2>Command list</h2>
+                <p>These are the Tauri commands exposed by the Rust side. The JS bindings are a thin wrapper over
+                    them.</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Arguments</th>
+                            <th>Returns</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|torch</span></td>
+                            <td><span class="ptype">{ enabled: boolean, level?: number }</span></td>
+                            <td><span class="ptype">void</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|is_available</span></td>
+                            <td>—</td>
+                            <td><span class="ptype">boolean</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|is_enabled</span></td>
+                            <td>—</td>
+                            <td><span class="ptype">boolean</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><code>register_listener</code> and <code>remove_listener</code> are provided by Tauri itself for
+                    event subscription. They need permissions, but you never call them directly —
+                    <code>onTorchModeChanged</code> uses them internally.</p>
+                <h3>Events</h3>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Payload</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">torchModeChanged</span></td>
+                            <td><span class="ptype">{ enabled: boolean, available: boolean }</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="raw-invoke">
+                <h2>Using raw invoke</h2>
+                <p>You can skip the npm package entirely.</p>
+                <pre data-lang="js"><code>import { invoke } from "@tauri-apps/api/core"
+
+await invoke("plugin:torchlight|torch", { enabled: true, level: 0.5 })
+
+const available = await invoke("plugin:torchlight|is_available")
+const enabled = await invoke("plugin:torchlight|is_enabled")</code></pre>
+                <p>Subscribe to the event with <code>addPluginListener</code>:</p>
+                <pre data-lang="js"><code>import { addPluginListener } from "@tauri-apps/api/core"
+
+const listener = await addPluginListener("torchlight", "torchModeChanged", (payload) =&gt; {
+    console.log(payload.enabled, payload.available)
+})</code></pre>
+            </section>
+
+            <section id="permissions">
+                <h2>Permissions (capabilities)</h2>
+                <p><code>torchlight:default</code> includes these five:</p>
+                <ul class="bullets">
+                    <li><code>allow-torch</code></li>
+                    <li><code>allow-is-available</code></li>
+                    <li><code>allow-is-enabled</code></li>
+                    <li><code>allow-register-listener</code></li>
+                    <li><code>allow-remove-listener</code></li>
+                </ul>
+                <p>To be more restrictive, grant them individually as
+                    <code>torchlight:allow-torch</code> and so on. Each command also has a matching
+                    <code>deny-*</code> permission.</p>
+                <div class="note">
+                    <div class="note-title">Events need two of them</div>
+                    <code>onTorchModeChanged</code> requires both <code>allow-register-listener</code> and
+                    <code>allow-remove-listener</code>.
+                </div>
+                <h3>A read-only configuration</h3>
+                <p>To observe the torch without ever turning it on:</p>
+                <pre data-lang="json"><code>{
+    "permissions": [
+        "torchlight:allow-is-available",
+        "torchlight:allow-is-enabled",
+        "torchlight:allow-register-listener",
+        "torchlight:allow-remove-listener"
+    ]
+}</code></pre>
+            </section>
+
+            <section id="rust-init">
+                <h2>init</h2>
+                <pre data-lang="rust"><code>pub fn init&lt;R: Runtime&gt;() -&gt; TauriPlugin&lt;R&gt;</code></pre>
+                <p>Builds the plugin; pass it to <code>tauri::Builder::plugin()</code>. On mobile it registers the
+                    native plugin (<code>TorchlightPlugin</code> on Android, <code>init_plugin_torchlight</code> on
+                    iOS); on desktop it registers the stub implementation.</p>
+            </section>
+
+            <section id="rust-ext">
+                <h2>TorchlightExt</h2>
+                <p>To drive the torch from Rust, use the extension trait available on any
+                    <code>Manager</code> (such as <code>AppHandle</code>).</p>
+                <pre data-lang="rust"><code>use tauri_plugin_torchlight::TorchlightExt;
+
+#[tauri::command]
+async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;()&gt; {
+    if app.torchlight().is_available()? {
+        app.torchlight().torch(true, Some(0.7))?;
+        std::thread::sleep(std::time::Duration::from_millis(200));
+        app.torchlight().torch(false, None)?;
+    }
+    Ok(())
+}</code></pre>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Signature</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">torch</span></td>
+                            <td><span class="ptype">fn torch(&amp;self, enabled: bool, level: Option&lt;f64&gt;) -&gt; Result&lt;()&gt;</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">is_available</span></td>
+                            <td><span class="ptype">fn is_available(&amp;self) -&gt; Result&lt;bool&gt;</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">is_enabled</span></td>
+                            <td><span class="ptype">fn is_enabled(&amp;self) -&gt; Result&lt;bool&gt;</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="rust-error">
+                <h2>Error</h2>
+                <pre data-lang="rust"><code>pub enum Error {
+    /// The native mobile plugin returned an error (mobile only)
+    PluginInvoke(tauri::plugin::mobile::PluginInvokeError),
+    /// No torch hardware exists on desktop (desktop only)
+    Unsupported,
+}</code></pre>
+                <p><code>Error</code> serializes to a string, so the JS side receives a human-readable rejection
+                    value. The desktop <code>Unsupported</code> message is:</p>
+                <pre data-lang="text"><code>torchlight is only supported on Android and iOS; this is a desktop platform</code></pre>
+            </section>
+
+            <section id="platform-matrix">
+                <h2>Support matrix</h2>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Android</th>
+                            <th>iOS</th>
+                            <th>Desktop</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>On / off</td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat no">Error</span></td>
+                        </tr>
+                        <tr>
+                            <td>Brightness</td>
+                            <td><span class="plat ok">API 33+</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat no">Error</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>isAvailable</code></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat">Always false</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>isEnabled</code></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat">Always false</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>torchModeChanged</code></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat ok">Yes</span></td>
+                            <td><span class="plat">Never fires</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="platform-android">
+                <h2>Android</h2>
+                <ul class="bullets">
+                    <li>On/off goes through <code>CameraManager.setTorchMode</code>.</li>
+                    <li>Brightness uses <code>turnOnTorchWithStrengthLevel</code> on API 33 (Android 13) and later. A
+                        device whose <code>FLASH_INFO_STRENGTH_MAXIMUM_LEVEL</code> is <code>1</code> or less is
+                        treated as having no brightness control and falls back to a plain toggle.
+                    </li>
+                    <li>A <code>0.0</code>–<code>1.0</code> level is mapped onto the device's <code>1..maxLevel</code>
+                        range. The result is always at least <code>1</code>, so <code>setTorch(true, 0.0)</code> does
+                        not turn the torch off.
+                    </li>
+                    <li>The camera used is the first one whose <code>FLASH_INFO_AVAILABLE</code> is <code>true</code>
+                        (usually the rear one). If none is found, <code>isAvailable()</code> returns
+                        <code>false</code> and <code>torch</code> rejects.
+                    </li>
+                    <li>No <code>CAMERA</code> runtime permission is needed.</li>
+                    <li>Requires <code>minSdk 23</code>.</li>
+                </ul>
+            </section>
+
+            <section id="platform-ios">
+                <h2>iOS</h2>
+                <ul class="bullets">
+                    <li>Uses <code>AVCaptureDevice.default(for: .video)</code>, but only when it reports
+                        <code>hasTorch</code>.
+                    </li>
+                    <li>Brightness uses <code>setTorchModeOn(level:)</code>. When the level is <code>1.0</code> or
+                        above, <code>AVCaptureMaxAvailableTorchLevel</code> is used instead, because passing exactly
+                        <code>1.0</code> can throw.
+                    </li>
+                    <li>Omitting <code>level</code> means full brightness. Out-of-range values are clamped.</li>
+                    <li>Under thermal pressure the call can fail (for example
+                        <code>AVErrorTorchLevelUnavailable</code>) and the promise rejects.
+                    </li>
+                    <li>Requires iOS 13 or later.</li>
+                </ul>
+                <div class="note">
+                    <div class="note-title">About Info.plist</div>
+                    Torch control does not need <code>NSCameraUsageDescription</code>. If your app also captures
+                    from the camera, follow that feature's own requirements.
+                </div>
+            </section>
+
+            <section id="platform-desktop">
+                <h2>Desktop</h2>
+                <p>Desktop machines have no torch hardware, so the plugin is explicit rather than silently pretending
+                    to succeed.</p>
+                <ul class="bullets">
+                    <li><code>setTorch()</code> rejects with the <code>Unsupported</code> error.</li>
+                    <li><code>isAvailable()</code> and <code>isEnabled()</code> return <code>false</code>.</li>
+                </ul>
+                <p>As long as you branch on <code>isAvailable()</code>, running on desktop during development will
+                    not break your UI.</p>
+            </section>
+
+            <section id="recipe-ui">
+                <h2>Keeping the UI in sync</h2>
+                <p>The torch can change for reasons outside your app. Read the initial state, then follow the event.
+                </p>
+                <pre data-lang="tsx"><code>import { useEffect, useState } from "react"
+import { isAvailable, isEnabled, onTorchModeChanged, setTorch } from "tauri-plugin-torchlight-api"
+
+export function TorchButton() {
+    const [supported, setSupported] = useState(false)
+    const [lit, setLit] = useState(false)
+
+    useEffect(() =&gt; {
+        let listener: { unregister: () =&gt; Promise&lt;void&gt; } | undefined
+        let disposed = false
+
+        ;(async () =&gt; {
+            setSupported(await isAvailable())
+            setLit(await isEnabled())
+
+            const l = await onTorchModeChanged(({ enabled, available }) =&gt; {
+                setLit(enabled)
+                setSupported(available)
+            })
+            // Handle unmounting before registration finished
+            if (disposed) await l.unregister()
+            else listener = l
+        })()
+
+        return () =&gt; {
+            disposed = true
+            listener?.unregister()
+        }
+    }, [])
+
+    if (!supported) return null
+
+    return (
+        &lt;button onClick={() =&gt; setTorch(!lit)}&gt;
+            {lit ? "Turn torch off" : "Turn torch on"}
+        &lt;/button&gt;
+    )
+}</code></pre>
+            </section>
+
+            <section id="recipe-brightness">
+                <h2>Working with brightness</h2>
+                <p>There is no API to ask whether brightness control is supported. Passing a <code>level</code> is
+                    always safe: devices without support simply turn on at full power rather than failing.</p>
+                <pre data-lang="ts"><code>// 30% where supported, full brightness elsewhere
+await setTorch(true, 0.3)</code></pre>
+                <div class="note warn">
+                    <div class="note-title"><code>level: 0</code> does not turn the torch off</div>
+                    <code>setTorch(true, 0)</code> means "turn on at the lowest possible brightness". To turn the
+                    torch off, always use <code>setTorch(false)</code>.
+                </div>
+                <p>To change brightness while the torch is already lit, call again with
+                    <code>enabled: true</code> and a different level.</p>
+                <pre data-lang="ts"><code>await setTorch(true, 0.2)
+await setTorch(true, 0.8) // changes brightness without turning off</code></pre>
+            </section>
+
+            <section id="recipe-errors">
+                <h2>Error handling</h2>
+                <p>The main cases where <code>setTorch()</code> rejects:</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>Situation</th>
+                            <th>Message</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Running on desktop</td>
+                            <td><code>torchlight is only supported on Android and iOS; this is a desktop platform</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Device has no flash unit</td>
+                            <td><code>Torch is not available on this device</code></td>
+                        </tr>
+                        <tr>
+                            <td>Android cannot access the camera</td>
+                            <td>The <code>CameraAccessException</code> message, or <code>Camera access error</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>iOS fails to light the torch (thermal limits, etc.)</td>
+                            <td><code>Torch could not be used: ...</code></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <pre data-lang="ts"><code>try {
+    await setTorch(true)
+} catch (e) {
+    // arrives as a string
+    console.warn("could not turn the torch on:", e)
+}</code></pre>
+                <p>Prefer branching on <code>isAvailable()</code> up front over matching on message text.</p>
+            </section>
+
+            <section id="limitations">
+                <h2>Limitations</h2>
+                <div class="note warn">
+                    <div class="note-title">Not supported today</div>
+                    <ul class="bullets" style="margin-bottom:0">
+                        <li>No built-in strobe or blink patterns — drive <code>setTorch()</code> from your own timer
+                            if you need them.
+                        </li>
+                        <li>No API to query whether brightness control is supported (it falls back to full
+                            brightness).
+                        </li>
+                        <li>No camera selection — the first camera with a flash unit is used.</li>
+                        <li>On Android, brightness only works on API 33 and later.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2>Troubleshooting</h2>
+                <h3>The command fails with a permission error</h3>
+                <p>Check that <code>torchlight:default</code> is listed in
+                    <code>src-tauri/capabilities/*.json</code>. If you use the event, you also need
+                    <code>allow-register-listener</code> and <code>allow-remove-listener</code>.</p>
+                <h3>isAvailable() returns false</h3>
+                <p>You are probably on a device without a flash unit, an emulator or simulator, or desktop. Verify on
+                    real hardware.</p>
+                <h3>Brightness changes have no visible effect</h3>
+                <p>Android 12 and earlier, and devices whose
+                    <code>FLASH_INFO_STRENGTH_MAXIMUM_LEVEL</code> is <code>1</code>, do not support brightness
+                    control. Turning on at full power is the documented fallback.</p>
+                <h3>The torch went off when I opened another app</h3>
+                <p>Another app took the camera, or the OS turned it off. Subscribe to
+                    <code>onTorchModeChanged</code> to keep the UI correct.</p>
+            </section>
+
+            <section id="release">
+                <h2>Releases and versioning</h2>
+                <p><code>tauri-plugin-torchlight</code> on crates.io and
+                    <code>tauri-plugin-torchlight-api</code> on npm are published together under the same version
+                    number. A push to <code>main</code> triggers the GitHub Actions workflow that publishes both;
+                    versions that already exist are skipped.</p>
+                <p>The project is dual licensed under MIT and Apache-2.0, at your option.</p>
+            </section>
+
+            <p style="margin-top:48px;color:var(--text-faint);font-size:13px;border-top:1px solid var(--border);padding-top:20px">
+                tauri-plugin-torchlight · MIT OR Apache-2.0 ·
+                <a href="https://crates.io/crates/tauri-plugin-torchlight" rel="noopener" target="_blank">crates.io</a> ·
+                <a href="https://www.npmjs.com/package/tauri-plugin-torchlight-api" rel="noopener" target="_blank">npm</a>
+                ·
+                <a href="https://github.com/lembryo/tauri-plugin-torchlight" rel="noopener" target="_blank">GitHub</a>
+            </p>
+        </div>
+    </main>
+
+    <nav class="toc" id="toc">
+        <div class="toc-title">On this page</div>
+        <ul id="tocList"></ul>
+    </nav>
+</div>
+
+<script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,817 @@
+<!doctype html>
+<html data-lang="ja" lang="ja">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>tauri-plugin-torchlight — Tauri v2 用のスマホ ライト（トーチ）制御プラグイン | ドキュメント</title>
+    <meta
+        content="tauri-plugin-torchlight は Tauri v2 アプリからスマートフォンのライト（トーチ／フラッシュライト）を制御するプラグイン。点灯・消灯、明るさ調整、利用可否と状態の取得、システム側の変化イベントに対応。Android は CameraManager、iOS は AVFoundation を使用。Rust + TypeScript、MIT / Apache-2.0。インストールから API まで日本語で解説。"
+        name="description"/>
+    <meta
+        content="tauri-plugin-torchlight, Tauri, Tauri v2, プラグイン, トーチ, フラッシュライト, 懐中電灯, ライト, Android, iOS, CameraManager, AVFoundation, Rust, TypeScript, モバイル"
+        name="keywords"/>
+    <meta content="mao" name="author"/>
+    <meta content="index, follow, max-image-preview:large, max-snippet:-1" name="robots"/>
+    <meta content="#f59e0b" name="theme-color"/>
+    <meta content="notranslate" name="google"/>
+
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/ja/" rel="canonical"/>
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/ja/" hreflang="ja" rel="alternate"/>
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/en/" hreflang="en" rel="alternate"/>
+    <link href="https://lembryo.github.io/tauri-plugin-torchlight/" hreflang="x-default" rel="alternate"/>
+
+    <!-- Open Graph -->
+    <meta content="website" property="og:type"/>
+    <meta content="tauri-plugin-torchlight" property="og:site_name"/>
+    <meta content="ja_JP" property="og:locale"/>
+    <meta content="en_US" property="og:locale:alternate"/>
+    <meta content="tauri-plugin-torchlight — Tauri v2 用のスマホ ライト（トーチ）制御プラグイン" property="og:title"/>
+    <meta
+        content="Tauri v2 アプリからスマートフォンのライトを制御。点灯・消灯、明るさ調整、利用可否と状態の取得、システム側の変化イベントに対応。Android / iOS 対応、MIT / Apache-2.0。"
+        property="og:description"/>
+    <meta content="https://lembryo.github.io/tauri-plugin-torchlight/ja/" property="og:url"/>
+
+    <!-- Twitter Card -->
+    <meta content="summary" name="twitter:card"/>
+    <meta content="tauri-plugin-torchlight — Tauri v2 用のスマホ ライト（トーチ）制御プラグイン" name="twitter:title"/>
+    <meta
+        content="Tauri v2 アプリからスマートフォンのライトを制御。明るさ調整・状態取得・変化イベントに対応。Android / iOS、MIT / Apache-2.0。"
+        name="twitter:description"/>
+
+    <link href="../favicon.svg" rel="icon" type="image/svg+xml"/>
+    <link href="../styles.css" rel="stylesheet"/>
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "tauri-plugin-torchlight",
+            "description": "Tauri v2 アプリから Android / iOS 端末のライト（トーチ）を制御するプラグイン。点灯・消灯、明るさ調整、利用可否と状態の取得、システム側の変化イベントに対応。",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Android, iOS",
+            "softwareVersion": "1.0.11",
+            "programmingLanguage": ["Rust", "TypeScript", "Kotlin", "Swift"],
+            "url": "https://lembryo.github.io/tauri-plugin-torchlight/",
+            "downloadUrl": "https://crates.io/crates/tauri-plugin-torchlight",
+            "sameAs": [
+                "https://github.com/lembryo/tauri-plugin-torchlight",
+                "https://crates.io/crates/tauri-plugin-torchlight",
+                "https://www.npmjs.com/package/tauri-plugin-torchlight-api"
+            ],
+            "license": "https://opensource.org/licenses/MIT",
+            "author": {
+                "@type": "Person",
+                "name": "mao",
+                "email": "mao.lembryo@gmail.com"
+            },
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "inLanguage": "ja"
+        }
+    </script>
+</head>
+<body>
+<header class="site-header">
+    <button aria-label="メニュー" class="menu-toggle" id="menuToggle">☰</button>
+    <a class="brand" href="./">
+        <span class="logo">T</span>
+        <span>torchlight</span>
+        <span class="ver">v1.0.11</span>
+    </a>
+    <span class="spacer"></span>
+    <div class="lang-switch">
+        <a class="active" href="./">日本語</a>
+        <a data-lang="en" data-lang-link href="../en/">EN</a>
+    </div>
+    <nav class="header-links">
+        <a href="https://crates.io/crates/tauri-plugin-torchlight" rel="noopener" target="_blank">crates.io</a>
+        <a href="https://www.npmjs.com/package/tauri-plugin-torchlight-api" rel="noopener" target="_blank">npm</a>
+        <a href="https://github.com/lembryo/tauri-plugin-torchlight" rel="noopener" target="_blank">GitHub</a>
+    </nav>
+</header>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="layout">
+    <aside class="sidebar" id="sidebar">
+        <nav>
+            <div class="nav-group">
+                <button class="group-title">はじめに<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#overview">概要</a></li>
+                    <li><a href="#requirements">動作要件</a></li>
+                    <li><a href="#installation">インストール</a></li>
+                    <li><a href="#setup">セットアップ</a></li>
+                    <li><a href="#quickstart">クイックスタート</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">JavaScript API<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#js-settorch">setTorch</a></li>
+                    <li><a href="#js-isavailable">isAvailable</a></li>
+                    <li><a href="#js-isenabled">isEnabled</a></li>
+                    <li><a href="#js-toggle">toggle</a></li>
+                    <li><a href="#js-ontorchmodechanged">onTorchModeChanged</a></li>
+                    <li><a href="#js-types">型リファレンス</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">コマンドと権限<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#commands">コマンド一覧</a></li>
+                    <li><a href="#raw-invoke">invoke で直接呼ぶ</a></li>
+                    <li><a href="#permissions">権限（capabilities）</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">Rust API<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#rust-init">init</a></li>
+                    <li><a href="#rust-ext">TorchlightExt</a></li>
+                    <li><a href="#rust-error">Error</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">プラットフォーム<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#platform-matrix">対応状況</a></li>
+                    <li><a href="#platform-android">Android</a></li>
+                    <li><a href="#platform-ios">iOS</a></li>
+                    <li><a href="#platform-desktop">デスクトップ</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">ガイド<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#recipe-ui">UI を状態と同期する</a></li>
+                    <li><a href="#recipe-brightness">明るさを扱う</a></li>
+                    <li><a href="#recipe-errors">エラーハンドリング</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <button class="group-title">リファレンス<span class="chevron">▼</span></button>
+                <ul>
+                    <li><a href="#limitations">制限事項</a></li>
+                    <li><a href="#troubleshooting">トラブルシューティング</a></li>
+                    <li><a href="#release">リリースとバージョン</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <div class="content-inner">
+            <h1>tauri-plugin-torchlight</h1>
+            <p class="lead">Tauri v2 アプリからスマートフォンのライト（トーチ）を制御するプラグイン。点灯・消灯、明るさ調整、利用可否と現在状態の取得、そしてシステム側でライトが変化したときのイベント通知に対応します。Android
+                と iOS 向けです。</p>
+
+            <p style="margin:0 0 28px">
+                <a href="https://github.com/lembryo/tauri-plugin-torchlight" rel="noopener" target="_blank"
+                   style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:700;text-decoration:none;padding:9px 18px;border-radius:8px">
+                    GitHub で見る
+                </a>
+                <span style="color:var(--text-faint);font-size:13px;margin-left:12px">MIT / Apache-2.0 デュアルライセンス</span>
+            </p>
+
+            <section id="overview">
+                <h2>概要</h2>
+                <p>このプラグインは、Tauri v2 のモバイルアプリからカメラのフラッシュユニットを「懐中電灯」として使うための最小限の API
+                    を提供します。Rust 側のコマンドと、型付きの JavaScript/TypeScript バインディングの 2 つのパッケージで構成されます。</p>
+                <ul class="bullets">
+                    <li><strong>点灯・消灯</strong> — <code>setTorch(true)</code> / <code>setTorch(false)</code>。</li>
+                    <li><strong>明るさ調整</strong> — <code>0.0</code>〜<code>1.0</code> の範囲で指定。対応端末（iOS、および
+                        Android 13+）でのみ有効で、非対応端末では単純に最大輝度で点灯します。
+                    </li>
+                    <li><strong>利用可否の判定</strong> — <code>isAvailable()</code>。フラッシュユニットを実際に持つカメラがあるかどうかを返します。
+                    </li>
+                    <li><strong>現在状態の取得</strong> — <code>isEnabled()</code>。</li>
+                    <li><strong>変化イベント</strong> — <code>onTorchModeChanged()</code>。OS
+                        や他アプリ、発熱制限によってライトが消えた場合でも UI を追従させられます。
+                    </li>
+                    <li><strong>デスクトップでの明示的な挙動</strong> — 黙って何もしないのではなく、はっきりとエラーを返します。</li>
+                </ul>
+                <div class="note">
+                    <div class="note-title">2 つのパッケージ</div>
+                    Rust 本体の <code>tauri-plugin-torchlight</code>（crates.io）と、JS/TS バインディングの
+                    <code>tauri-plugin-torchlight-api</code>（npm）は同じバージョン番号で同時にリリースされます。
+                </div>
+            </section>
+
+            <section id="requirements">
+                <h2>動作要件</h2>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>要件</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">Tauri</span></td>
+                            <td>v2</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">Rust</span></td>
+                            <td>1.85.0 以上（edition 2024）</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">Android</span></td>
+                            <td><code>minSdk 23</code> 以上。明るさ調整は API 33（Android 13）以上</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">iOS</span></td>
+                            <td>iOS 13 以上</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">@tauri-apps/api</span></td>
+                            <td>v2（JS バインディングの依存）</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2>インストール</h2>
+                <h3>Rust 側</h3>
+                <pre data-lang="bash"><code>cargo add tauri-plugin-torchlight</code></pre>
+                <p><code>src-tauri/Cargo.toml</code> に直接書く場合:</p>
+                <pre data-lang="toml"><code>[dependencies]
+tauri-plugin-torchlight = "1"</code></pre>
+
+                <h3>JavaScript / TypeScript 側</h3>
+                <p>型付きヘルパを使うためのバインディングです（必須ではありませんが推奨。使わない場合は <code>invoke</code> を直接呼びます）。</p>
+                <pre data-lang="bash"><code>npm install tauri-plugin-torchlight-api</code></pre>
+            </section>
+
+            <section id="setup">
+                <h2>セットアップ</h2>
+                <p>プラグインを <code>src-tauri/src/lib.rs</code> で登録します。</p>
+                <pre data-lang="rust"><code>fn main() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_torchlight::init()) // この行を追加
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}</code></pre>
+                <p>続いて <code>src-tauri/capabilities/default.json</code> で権限を付与します。</p>
+                <pre data-lang="json"><code>{
+    "permissions": [
+        "torchlight:default"
+    ]
+}</code></pre>
+                <div class="note">
+                    <div class="note-title">Android の権限について</div>
+                    <code>CAMERA</code> 権限は不要です。プラグインは <code>CameraManager.setTorchMode</code>
+                    を使うため、実行時パーミッションの要求は発生しません。マニフェストには
+                    <code>android.hardware.camera.flash</code> を <code>required="false"</code>
+                    として宣言しているだけなので、フラッシュのない端末にもインストールできます（その端末では
+                    <code>isAvailable()</code> が <code>false</code> を返します）。
+                </div>
+            </section>
+
+            <section id="quickstart">
+                <h2>クイックスタート</h2>
+                <pre data-lang="ts"><code>import {
+    setTorch,
+    isAvailable,
+    isEnabled,
+    toggle,
+    onTorchModeChanged,
+} from "tauri-plugin-torchlight-api"
+
+// ライトのボタンを出す前に、そもそも使えるかを確認する。
+if (await isAvailable()) {
+    await setTorch(true)            // 最大輝度で点灯
+    await setTorch(true, 0.5)       // 対応端末では半分の明るさ
+    const lit = await isEnabled()   // -> true
+    await toggle()                  // 現在状態を反転し、新しい状態を返す
+    await setTorch(false)           // 消灯
+}
+
+// システム側でライトが変わったときに追従する。
+const listener = await onTorchModeChanged(({ enabled, available }) =&gt; {
+    console.log("torch:", enabled, "available:", available)
+})
+
+// 不要になったら解除する
+await listener.unregister()</code></pre>
+            </section>
+
+            <section id="js-settorch">
+                <h2>setTorch</h2>
+                <pre data-lang="ts"><code>function setTorch(enabled: boolean, level?: number): Promise&lt;void&gt;</code></pre>
+                <p>ライトを点灯・消灯します。</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>引数</th>
+                            <th>型</th>
+                            <th>説明</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">enabled</span><span class="req">必須</span></td>
+                            <td><span class="ptype">boolean</span></td>
+                            <td><code>true</code> で点灯、<code>false</code> で消灯。</td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">level</span><span class="opt">任意</span></td>
+                            <td><span class="ptype">number</span></td>
+                            <td>明るさ（<code>0.0</code>〜<code>1.0</code>）。点灯時、かつ明るさ調整に対応した端末でのみ使われます。範囲外の値はクランプされ、省略時は最大輝度になります。
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>ライトを持たない端末や、デスクトップでは reject されます。詳しくは<a href="#recipe-errors">エラーハンドリング</a>を参照してください。
+                </p>
+            </section>
+
+            <section id="js-isavailable">
+                <h2>isAvailable</h2>
+                <pre data-lang="ts"><code>function isAvailable(): Promise&lt;boolean&gt;</code></pre>
+                <p>制御可能なライトが端末にあるかどうかを返します。Android ではフラッシュユニットを持つカメラを探し、iOS では既定のビデオデバイスが
+                    <code>hasTorch</code> かどうかを見ます。デスクトップでは常に <code>false</code> です。</p>
+                <p>ライトのボタンを表示するかどうかの判定に使ってください。</p>
+            </section>
+
+            <section id="js-isenabled">
+                <h2>isEnabled</h2>
+                <pre data-lang="ts"><code>function isEnabled(): Promise&lt;boolean&gt;</code></pre>
+                <p>現在ライトが点いているかどうかを返します。デスクトップでは常に <code>false</code> です。</p>
+                <div class="note">
+                    <div class="note-title">Android での取得元</div>
+                    Android の値は <code>CameraManager.TorchCallback</code> で更新されるキャッシュから返します。プラグインの
+                    <code>load</code> 時にコールバックを登録するため、他アプリや OS による変更も反映されます。
+                </div>
+            </section>
+
+            <section id="js-toggle">
+                <h2>toggle</h2>
+                <pre data-lang="ts"><code>function toggle(): Promise&lt;boolean&gt;</code></pre>
+                <p>現在の状態を反転し、反転後の状態を返します。<code>isEnabled()</code> と <code>setTorch()</code>
+                    を続けて呼ぶだけの薄いヘルパです。明るさは指定できません（常に最大輝度で点灯します）。</p>
+            </section>
+
+            <section id="js-ontorchmodechanged">
+                <h2>onTorchModeChanged</h2>
+                <pre data-lang="ts"><code>function onTorchModeChanged(
+    handler: (payload: TorchModeChangedPayload) =&gt; void,
+): Promise&lt;PluginListener&gt;</code></pre>
+                <p>システム側でライトの状態が変わったときに呼ばれるリスナを登録します。他のアプリがカメラを掴んだ場合、発熱制限がかかった場合、OS
+                    が消灯した場合などに発火します。</p>
+                <p>戻り値の <code>PluginListener</code> は <code>@tauri-apps/api/core</code> の型です。不要になったら必ず
+                    <code>unregister()</code> を呼んでください。</p>
+                <pre data-lang="ts"><code>const listener = await onTorchModeChanged(({ enabled, available }) =&gt; {
+    setLit(enabled)
+    setSupported(available)
+})
+
+// コンポーネントの破棄時などに
+await listener.unregister()</code></pre>
+                <div class="note warn">
+                    <div class="note-title">発火タイミングはプラットフォームで異なります</div>
+                    Android は <code>CameraManager.TorchCallback</code>（<code>onTorchModeChanged</code> /
+                    <code>onTorchModeUnavailable</code>）を、iOS は <code>AVCaptureDevice.isTorchActive</code> の KVO
+                    を使います。自分で <code>setTorch()</code> を呼んだ場合にもイベントが発火する点に注意してください。
+                </div>
+            </section>
+
+            <section id="js-types">
+                <h2>型リファレンス</h2>
+                <pre data-lang="ts"><code>interface TorchModeChangedPayload {
+    /** ライトが現在点いているか。 */
+    enabled: boolean
+    /** ライトが現在使用可能か。 */
+    available: boolean
+}</code></pre>
+            </section>
+
+            <section id="commands">
+                <h2>コマンド一覧</h2>
+                <p>Rust 側で公開されている Tauri コマンドです。JS バインディングはこれらを呼び出しているだけです。</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>コマンド</th>
+                            <th>引数</th>
+                            <th>戻り値</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|torch</span></td>
+                            <td><span class="ptype">{ enabled: boolean, level?: number }</span></td>
+                            <td><span class="ptype">void</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|is_available</span></td>
+                            <td>—</td>
+                            <td><span class="ptype">boolean</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">plugin:torchlight|is_enabled</span></td>
+                            <td>—</td>
+                            <td><span class="ptype">boolean</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>イベント購読に使う <code>register_listener</code> / <code>remove_listener</code> は Tauri
+                    が提供するもので、権限の対象にはなりますがアプリから直接呼ぶ必要はありません（<code>onTorchModeChanged</code> が内部で使います）。</p>
+                <h3>イベント</h3>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>イベント名</th>
+                            <th>ペイロード</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">torchModeChanged</span></td>
+                            <td><span class="ptype">{ enabled: boolean, available: boolean }</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="raw-invoke">
+                <h2>invoke で直接呼ぶ</h2>
+                <p>npm パッケージを入れずに使うこともできます。</p>
+                <pre data-lang="js"><code>import { invoke } from "@tauri-apps/api/core"
+
+await invoke("plugin:torchlight|torch", { enabled: true, level: 0.5 })
+
+const available = await invoke("plugin:torchlight|is_available")
+const enabled = await invoke("plugin:torchlight|is_enabled")</code></pre>
+                <p>イベントを購読する場合は <code>addPluginListener</code> を使います。</p>
+                <pre data-lang="js"><code>import { addPluginListener } from "@tauri-apps/api/core"
+
+const listener = await addPluginListener("torchlight", "torchModeChanged", (payload) =&gt; {
+    console.log(payload.enabled, payload.available)
+})</code></pre>
+            </section>
+
+            <section id="permissions">
+                <h2>権限（capabilities）</h2>
+                <p><code>torchlight:default</code> には次の 5 つが含まれます。</p>
+                <ul class="bullets">
+                    <li><code>allow-torch</code></li>
+                    <li><code>allow-is-available</code></li>
+                    <li><code>allow-is-enabled</code></li>
+                    <li><code>allow-register-listener</code></li>
+                    <li><code>allow-remove-listener</code></li>
+                </ul>
+                <p>個別に絞りたい場合は <code>torchlight:allow-torch</code> のように指定します。各コマンドには対応する
+                    <code>deny-*</code> もあります。</p>
+                <div class="note">
+                    <div class="note-title">イベントを使うなら 2 つ必要</div>
+                    <code>onTorchModeChanged</code> は <code>allow-register-listener</code> と
+                    <code>allow-remove-listener</code> の両方を必要とします。
+                </div>
+                <h3>読み取り専用の構成例</h3>
+                <p>点灯はさせず、状態の監視だけを許可する場合:</p>
+                <pre data-lang="json"><code>{
+    "permissions": [
+        "torchlight:allow-is-available",
+        "torchlight:allow-is-enabled",
+        "torchlight:allow-register-listener",
+        "torchlight:allow-remove-listener"
+    ]
+}</code></pre>
+            </section>
+
+            <section id="rust-init">
+                <h2>init</h2>
+                <pre data-lang="rust"><code>pub fn init&lt;R: Runtime&gt;() -&gt; TauriPlugin&lt;R&gt;</code></pre>
+                <p>プラグインを構築します。<code>tauri::Builder::plugin()</code> に渡してください。モバイルではネイティブプラグイン（Android
+                    の <code>TorchlightPlugin</code> / iOS の <code>init_plugin_torchlight</code>）を登録し、デスクトップではスタブ実装を登録します。
+                </p>
+            </section>
+
+            <section id="rust-ext">
+                <h2>TorchlightExt</h2>
+                <p>Rust 側からライトを操作したい場合は、<code>Manager</code> を実装した型（<code>AppHandle</code> など）に生えている拡張トレイトを使います。
+                </p>
+                <pre data-lang="rust"><code>use tauri_plugin_torchlight::TorchlightExt;
+
+#[tauri::command]
+async fn blink(app: tauri::AppHandle) -&gt; tauri_plugin_torchlight::Result&lt;()&gt; {
+    if app.torchlight().is_available()? {
+        app.torchlight().torch(true, Some(0.7))?;
+        std::thread::sleep(std::time::Duration::from_millis(200));
+        app.torchlight().torch(false, None)?;
+    }
+    Ok(())
+}</code></pre>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>メソッド</th>
+                            <th>シグネチャ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><span class="pname">torch</span></td>
+                            <td><span class="ptype">fn torch(&amp;self, enabled: bool, level: Option&lt;f64&gt;) -&gt; Result&lt;()&gt;</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">is_available</span></td>
+                            <td><span class="ptype">fn is_available(&amp;self) -&gt; Result&lt;bool&gt;</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="pname">is_enabled</span></td>
+                            <td><span class="ptype">fn is_enabled(&amp;self) -&gt; Result&lt;bool&gt;</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="rust-error">
+                <h2>Error</h2>
+                <pre data-lang="rust"><code>pub enum Error {
+    /// モバイルのネイティブプラグインがエラーを返した（mobile のみ）
+    PluginInvoke(tauri::plugin::mobile::PluginInvokeError),
+    /// デスクトップにはハードウェアが存在しない（desktop のみ）
+    Unsupported,
+}</code></pre>
+                <p><code>Error</code> は文字列としてシリアライズされるため、JS 側では <code>reject</code>
+                    の値が人間可読な文字列になります。デスクトップの <code>Unsupported</code> は次の文言です。</p>
+                <pre data-lang="text"><code>torchlight is only supported on Android and iOS; this is a desktop platform</code></pre>
+            </section>
+
+            <section id="platform-matrix">
+                <h2>対応状況</h2>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>機能</th>
+                            <th>Android</th>
+                            <th>iOS</th>
+                            <th>デスクトップ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>点灯・消灯</td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat no">エラー</span></td>
+                        </tr>
+                        <tr>
+                            <td>明るさ調整</td>
+                            <td><span class="plat ok">API 33+</span></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat no">エラー</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>isAvailable</code></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat">常に false</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>isEnabled</code></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat">常に false</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>torchModeChanged</code></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat ok">対応</span></td>
+                            <td><span class="plat">発火しない</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="platform-android">
+                <h2>Android</h2>
+                <ul class="bullets">
+                    <li>点灯・消灯は <code>CameraManager.setTorchMode</code>。</li>
+                    <li>明るさは API 33（Android 13）以上で <code>turnOnTorchWithStrengthLevel</code> を使用。<code>FLASH_INFO_STRENGTH_MAXIMUM_LEVEL</code>
+                        が <code>1</code> 以下の端末は明るさ調整に非対応と判定し、通常の点灯にフォールバックします。
+                    </li>
+                    <li><code>0.0</code>〜<code>1.0</code> の値は端末の <code>1..maxLevel</code> に丸められます。結果は必ず
+                        <code>1</code> 以上になるため、<code>setTorch(true, 0.0)</code> でも消灯はしません。
+                    </li>
+                    <li>対象カメラは <code>FLASH_INFO_AVAILABLE</code> が <code>true</code>
+                        の最初のカメラ（通常は背面）です。見つからない場合は <code>isAvailable()</code> が <code>false</code>
+                        を返し、<code>torch</code> は reject します。
+                    </li>
+                    <li><code>CAMERA</code> 実行時権限は不要です。</li>
+                    <li><code>minSdk 23</code> が必要です。</li>
+                </ul>
+            </section>
+
+            <section id="platform-ios">
+                <h2>iOS</h2>
+                <ul class="bullets">
+                    <li><code>AVCaptureDevice.default(for: .video)</code> のうち <code>hasTorch</code>
+                        が真のデバイスを使用します。
+                    </li>
+                    <li>明るさは <code>setTorchModeOn(level:)</code>。<code>level</code> が <code>1.0</code>
+                        以上のときは、例外を避けるため <code>AVCaptureMaxAvailableTorchLevel</code> を使います。
+                    </li>
+                    <li><code>level</code> 省略時は最大輝度（<code>1.0</code> 扱い）。範囲外の値はクランプされます。</li>
+                    <li>発熱制限下では <code>AVErrorTorchLevelUnavailable</code> などで失敗することがあり、その場合は reject
+                        されます。
+                    </li>
+                    <li>iOS 13 以上が必要です。</li>
+                </ul>
+                <div class="note">
+                    <div class="note-title">Info.plist について</div>
+                    トーチ制御にカメラの使用許可（<code>NSCameraUsageDescription</code>）は不要です。ただし同じアプリ内でカメラ撮影も行う場合は、そちらの要件に従ってください。
+                </div>
+            </section>
+
+            <section id="platform-desktop">
+                <h2>デスクトップ</h2>
+                <p>デスクトップにはハードウェアのライトがないため、黙って成功したふりをするのではなく明示的に振る舞いを分けています。</p>
+                <ul class="bullets">
+                    <li><code>setTorch()</code> は <code>Unsupported</code> エラーで reject されます。</li>
+                    <li><code>isAvailable()</code> と <code>isEnabled()</code> は <code>false</code> を返します。</li>
+                </ul>
+                <p>したがって、開発中にデスクトップで動かしても <code>isAvailable()</code> で分岐しておけば UI
+                    が壊れることはありません。</p>
+            </section>
+
+            <section id="recipe-ui">
+                <h2>UI を状態と同期する</h2>
+                <p>ライトは自分のアプリ以外の要因でも変化します。初期状態を読み、以降はイベントで追従するのが基本形です。</p>
+                <pre data-lang="ts"><code>import { useEffect, useState } from "react"
+import { isAvailable, isEnabled, onTorchModeChanged, setTorch } from "tauri-plugin-torchlight-api"
+
+export function TorchButton() {
+    const [supported, setSupported] = useState(false)
+    const [lit, setLit] = useState(false)
+
+    useEffect(() =&gt; {
+        let listener: { unregister: () =&gt; Promise&lt;void&gt; } | undefined
+        let disposed = false
+
+        ;(async () =&gt; {
+            setSupported(await isAvailable())
+            setLit(await isEnabled())
+
+            const l = await onTorchModeChanged(({ enabled, available }) =&gt; {
+                setLit(enabled)
+                setSupported(available)
+            })
+            // 登録完了前にアンマウントされた場合に備える
+            if (disposed) await l.unregister()
+            else listener = l
+        })()
+
+        return () =&gt; {
+            disposed = true
+            listener?.unregister()
+        }
+    }, [])
+
+    if (!supported) return null
+
+    return (
+        &lt;button onClick={() =&gt; setTorch(!lit)}&gt;
+            {lit ? "ライトを消す" : "ライトを点ける"}
+        &lt;/button&gt;
+    )
+}</code></pre>
+            </section>
+
+            <section id="recipe-brightness">
+                <h2>明るさを扱う</h2>
+                <p>明るさ調整の可否を直接問い合わせる API はありません。<code>level</code>
+                    を渡しても、非対応端末では単に最大輝度で点灯するだけで、エラーにはなりません。安全に呼べます。</p>
+                <pre data-lang="ts"><code>// 対応端末では 30% の明るさ、非対応端末では最大輝度で点灯する
+await setTorch(true, 0.3)</code></pre>
+                <div class="note warn">
+                    <div class="note-title"><code>level: 0</code> は消灯ではありません</div>
+                    <code>setTorch(true, 0)</code> は「点灯し、可能な最小の明るさにする」という意味です。消したいときは必ず
+                    <code>setTorch(false)</code> を使ってください。
+                </div>
+                <p>点灯中に明るさだけを変えたい場合は、<code>enabled: true</code> のまま別の <code>level</code> で再度呼びます。</p>
+                <pre data-lang="ts"><code>await setTorch(true, 0.2)
+await setTorch(true, 0.8) // 消さずに明るさだけ変更</code></pre>
+            </section>
+
+            <section id="recipe-errors">
+                <h2>エラーハンドリング</h2>
+                <p><code>setTorch()</code> が reject する主なケースです。</p>
+                <div class="table-wrap">
+                    <table class="param-table">
+                        <thead>
+                        <tr>
+                            <th>状況</th>
+                            <th>メッセージ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>デスクトップで実行した</td>
+                            <td><code>torchlight is only supported on Android and iOS; this is a desktop platform</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>フラッシュのない端末</td>
+                            <td><code>Torch is not available on this device</code></td>
+                        </tr>
+                        <tr>
+                            <td>Android でカメラにアクセスできない</td>
+                            <td><code>CameraAccessException</code> のメッセージ、または
+                                <code>Camera access error</code></td>
+                        </tr>
+                        <tr>
+                            <td>iOS で点灯に失敗（発熱制限など）</td>
+                            <td><code>Torch could not be used: ...</code></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <pre data-lang="ts"><code>try {
+    await setTorch(true)
+} catch (e) {
+    // 文字列として届く
+    console.warn("ライトを点けられませんでした:", e)
+}</code></pre>
+                <p>メッセージ本文で分岐するのは避け、事前に <code>isAvailable()</code> で判定する設計を推奨します。</p>
+            </section>
+
+            <section id="limitations">
+                <h2>制限事項</h2>
+                <div class="note warn">
+                    <div class="note-title">現時点で未対応</div>
+                    <ul class="bullets" style="margin-bottom:0">
+                        <li>ストロボ／点滅パターンの組み込み機能はありません。必要なら <code>setTorch()</code>
+                            を自前のタイマーで呼んでください。
+                        </li>
+                        <li>明るさ調整に対応しているかを問い合わせる API はありません（非対応時は最大輝度にフォールバックします）。</li>
+                        <li>カメラの選択はできません。フラッシュを持つ最初のカメラが使われます。</li>
+                        <li>Android で明るさを指定できるのは API 33 以上のみです。</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2>トラブルシューティング</h2>
+                <h3>コマンドが権限エラーになる</h3>
+                <p><code>src-tauri/capabilities/*.json</code> に <code>torchlight:default</code>
+                    を追加したか確認してください。イベントを使う場合は <code>allow-register-listener</code> と
+                    <code>allow-remove-listener</code> も必要です。</p>
+                <h3>isAvailable() が false を返す</h3>
+                <p>フラッシュユニットのない端末、エミュレータ、シミュレータ、またはデスクトップで実行している可能性があります。実機で確認してください。
+                </p>
+                <h3>明るさを変えても見た目が変わらない</h3>
+                <p>Android 12 以前、または <code>FLASH_INFO_STRENGTH_MAXIMUM_LEVEL</code> が <code>1</code>
+                    の端末では明るさ調整に対応していません。仕様どおり最大輝度で点灯します。</p>
+                <h3>他のアプリを使ったらライトが消えた</h3>
+                <p>カメラを掴んだ他アプリや OS による消灯です。<code>onTorchModeChanged</code> を購読していれば UI
+                    を追従させられます。</p>
+            </section>
+
+            <section id="release">
+                <h2>リリースとバージョン</h2>
+                <p>crates.io の <code>tauri-plugin-torchlight</code> と npm の
+                    <code>tauri-plugin-torchlight-api</code> は同じバージョン番号で同時に公開されます。<code>main</code>
+                    への push をトリガーに GitHub Actions が両方を公開し、すでに公開済みのバージョンはスキップされます。</p>
+                <p>ライセンスは MIT または Apache-2.0 のデュアルライセンスで、利用者が選択できます。</p>
+            </section>
+
+            <p style="margin-top:48px;color:var(--text-faint);font-size:13px;border-top:1px solid var(--border);padding-top:20px">
+                tauri-plugin-torchlight · MIT OR Apache-2.0 ·
+                <a href="https://crates.io/crates/tauri-plugin-torchlight" rel="noopener" target="_blank">crates.io</a> ·
+                <a href="https://www.npmjs.com/package/tauri-plugin-torchlight-api" rel="noopener" target="_blank">npm</a>
+                ·
+                <a href="https://github.com/lembryo/tauri-plugin-torchlight" rel="noopener" target="_blank">GitHub</a>
+            </p>
+        </div>
+    </main>
+
+    <nav class="toc" id="toc">
+        <div class="toc-title">On this page</div>
+        <ul id="tocList"></ul>
+    </nav>
+</div>
+
+<script src="../script.js"></script>
+</body>
+</html>
