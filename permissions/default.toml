@@ -1,9 +1,11 @@
 [default]
-description = "Allows controlling and querying the device torch (on/off, brightness, availability and state)."
+description = "Allows controlling and querying the device torch (on/off, toggle, brightness, capabilities, availability and state)."
 permissions = [
     "allow-torch",
+    "allow-toggle",
     "allow-is-available",
     "allow-is-enabled",
+    "allow-capabilities",
     "allow-register-listener",
     "allow-remove-listener",
 ]

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lembryo.github.io/tauri-plugin-torchlight/sitemap.xml

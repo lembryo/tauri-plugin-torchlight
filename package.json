@@ -2,9 +2,9 @@
     "name": "tauri-plugin-torchlight-api",
     "version": "1.0.11",
     "author": "mao <mao.lembryo@gmail.com>",
-    "description": "JavaScript/TypeScript bindings for tauri-plugin-torchlight: control the smartphone torch (on/off, brightness, availability, state and change events) from Tauri v2 apps on Android and iOS.",
+    "description": "JavaScript/TypeScript bindings for tauri-plugin-torchlight: control the smartphone torch (on/off, atomic toggle, brightness, capabilities, state and change events) from Tauri v2 apps on Android and iOS.",
     "license": "MIT OR Apache-2.0",
-    "homepage": "https://github.com/lembryo/tauri-plugin-torchlight#readme",
+    "homepage": "https://lembryo.github.io/tauri-plugin-torchlight/",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/lembryo/tauri-plugin-torchlight.git"
@@ -28,7 +28,8 @@
     "exports": {
         "types": "./dist-js/index.d.ts",
         "import": "./dist-js/index.js",
-        "require": "./dist-js/index.cjs"
+        "require": "./dist-js/index.cjs",
+        "default": "./dist-js/index.js"
     },
     "files": [
         "dist-js",
@@ -40,7 +41,9 @@
         "build": "rollup -c",
         "prepare": "npm run build",
         "prepublishOnly": "npm run build",
-        "pretest": "npm run build"
+        "pretest": "npm run build",
+        "test": "tsc --noEmit",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@tauri-apps/api": "2"

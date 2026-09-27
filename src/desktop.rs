@@ -1,6 +1,7 @@
 use serde::de::DeserializeOwned;
 use tauri::{plugin::PluginApi, AppHandle, Runtime};
 
+use crate::models::TorchCapabilities;
 use crate::Error;
 
 pub fn init<R: Runtime, C: DeserializeOwned>(
@@ -12,13 +13,17 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
 
 /// Desktop implementation.
 ///
-/// Desktop machines have no controllable camera torch, so the mutating command
-/// returns a clear [`Error::Unsupported`] instead of silently pretending to
+/// Desktop machines have no controllable camera torch, so the mutating commands
+/// return a clear [`Error::Unsupported`] instead of silently pretending to
 /// succeed, while the query commands report that no torch is available.
 pub struct Torchlight<R: Runtime>(AppHandle<R>);
 
 impl<R: Runtime> Torchlight<R> {
     pub fn torch(&self, _enabled: bool, _level: Option<f64>) -> crate::Result<()> {
+        Err(Error::Unsupported)
+    }
+
+    pub fn toggle(&self, _level: Option<f64>) -> crate::Result<bool> {
         Err(Error::Unsupported)
     }
 
@@ -28,5 +33,9 @@ impl<R: Runtime> Torchlight<R> {
 
     pub fn is_enabled(&self) -> crate::Result<bool> {
         Ok(false)
+    }
+
+    pub fn capabilities(&self) -> crate::Result<TorchCapabilities> {
+        Ok(TorchCapabilities::NONE)
     }
 }

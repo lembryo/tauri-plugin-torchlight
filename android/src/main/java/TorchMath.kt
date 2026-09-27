@@ -12,10 +12,14 @@ internal object TorchMath {
      * Maps a `0.0..1.0` brightness onto the discrete `1..maxLevel` strength range
      * used by [android.hardware.camera2.CameraManager.turnOnTorchWithStrengthLevel].
      *
-     * The result is always clamped to a valid, on (`>= 1`) strength.
+     * The result is always clamped to a valid, on (`>= 1`) strength, so a
+     * requested level of `0.0` means "as dim as this device allows", never
+     * "off". `NaN` is treated as "no level requested" and maps to the minimum
+     * rather than throwing out of [roundToInt].
      */
     fun strengthFromLevel(level: Double, maxLevel: Int): Int {
         if (maxLevel <= 1) return 1
+        if (level.isNaN()) return 1
         val clamped = level.coerceIn(0.0, 1.0)
         val scaled = (clamped * maxLevel).roundToInt()
         return scaled.coerceIn(1, maxLevel)

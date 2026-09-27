@@ -3,7 +3,7 @@
     "semi": false,
     "tabWidth": 4,
     "useTabs": false,
-    "lineWidth": 120,
+    "printWidth": 120,
     "plugins": [
         "prettier-plugin-rust"
     ]

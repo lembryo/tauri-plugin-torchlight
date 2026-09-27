@@ -295,6 +295,18 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the capabilities command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-capabilities",
+          "markdownDescription": "Enables the capabilities command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the capabilities command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-capabilities",
+          "markdownDescription": "Denies the capabilities command without any pre-configured scope."
+        },
+        {
           "description": "Enables the is_available command without any pre-configured scope.",
           "type": "string",
           "const": "allow-is-available",
@@ -343,6 +355,18 @@
           "markdownDescription": "Denies the remove_listener command without any pre-configured scope."
         },
         {
+          "description": "Enables the toggle command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-toggle",
+          "markdownDescription": "Enables the toggle command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the toggle command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-toggle",
+          "markdownDescription": "Denies the toggle command without any pre-configured scope."
+        },
+        {
           "description": "Enables the torch command without any pre-configured scope.",
           "type": "string",
           "const": "allow-torch",
@@ -355,10 +379,10 @@
           "markdownDescription": "Denies the torch command without any pre-configured scope."
         },
         {
-          "description": "Allows controlling and querying the device torch (on/off, brightness, availability and state).\n#### This default permission set includes:\n\n- `allow-torch`\n- `allow-is-available`\n- `allow-is-enabled`\n- `allow-register-listener`\n- `allow-remove-listener`",
+          "description": "Allows controlling and querying the device torch (on/off, toggle, brightness, capabilities, availability and state).\n#### This default permission set includes:\n\n- `allow-torch`\n- `allow-toggle`\n- `allow-is-available`\n- `allow-is-enabled`\n- `allow-capabilities`\n- `allow-register-listener`\n- `allow-remove-listener`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Allows controlling and querying the device torch (on/off, brightness, availability and state).\n#### This default permission set includes:\n\n- `allow-torch`\n- `allow-is-available`\n- `allow-is-enabled`\n- `allow-register-listener`\n- `allow-remove-listener`"
+          "markdownDescription": "Allows controlling and querying the device torch (on/off, toggle, brightness, capabilities, availability and state).\n#### This default permission set includes:\n\n- `allow-torch`\n- `allow-toggle`\n- `allow-is-available`\n- `allow-is-enabled`\n- `allow-capabilities`\n- `allow-register-listener`\n- `allow-remove-listener`"
         }
       ]
     }
